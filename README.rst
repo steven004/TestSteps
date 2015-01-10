@@ -1,6 +1,12 @@
 Test Steps functions for each assertion and automatic logging
 ===============================================================
 
+.. image:: https://pypip.in/v/test_steps/badge.png
+    :target: https://crate.io/packages/test_steps/
+
+.. image:: https://pypip.in/d/test_steps/badge.png
+    :target: https://crate.io/packages/test_steps/
+
 TestSteps is to implement a bunch of functions about test steps and logging.
 The purpose is to simplify the assertion and automatically logging the steps,
 which are not supported in most of the current python test frames.
