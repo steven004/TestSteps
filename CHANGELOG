@@ -1,0 +1,11 @@
+v0.1
+-------------------------------------------
+
+This is a fairly complete list of v0.1, which can
+serve as a reference for test engineers.
+
+* automatically log test cases and steps
+* implemented general operators and corresponding functions, including::
+    eq, ne, gt, lt, ge, le, match, unmatch
+* implemented the framework for adding new operators and functions
+* implemented step/steps/s functions, which can be used in some test frameworks
