@@ -244,30 +244,21 @@ s = steps
 
 
 class TestStep:
-    options = {
-        # options supported, [fullname, paramType, func]
-        'repeat': ['r', 'int', ],
-        'timeout': ['t', 'int'],
-        'duration': ['d', 'int'],
-        'skip': ['s', 'bool'],
-        'xfail': ['x', 'bool'],
-        'warning': ['w', 'bool']
-    }
-    option_priority = ['xfail', 'repeat', 'timeout', 'duration', 'warning', 'skip']
-
     def __init__(self, code_string, globals, locals, **kwargs):
         self.code_string = code_string
         (self.globals, self.locals) = (globals, locals)
         self.kwargs = kwargs
-        self.options = {
-            # format: optionString: [HasThisOption, parameter, func]
-            'xfail': [False, self._xfail, False],
-            'repeat': [False, self._repeat, 0],
-            'timeout': [False, self._timeout, 30],
-            'duration': [False, self._duration, 30],
-            'warning': [False, self._warning, False],
-            'skip': [False, self._skip, False]
-        }
+        # self.options = {
+        #     # format: optionString: [HasThisOption, parameter, func]
+        #     'xfail': [False, False],
+        #     'repeat': [False,  0],
+        #     'timeout': [False, 30],
+        #     'duration': [False, 30],
+        #     'warning': [False, False],
+        #     'skip': [False, False]
+        # }
+
+        self.options = dict((k, [False, None]) for k in TestStepOptions.keys())
         self.op_string = None
         self.err_msg = ''
         self.expr1_str, self.expr2_str = (code_string, None)
@@ -284,7 +275,7 @@ class TestStep:
         option_d = {}
         if m:
             code_string, option_string = m.group(1,2)
-            short_opt_d = dict((v[0], k) for k, v in TestStep.options.items())
+            short_opt_d = dict((v[0], k) for k, v in TestStepOptions.items())
             ol = re.compile(r'(?<!^)\s+(?=(?:-\w|--\w{2,}))').split(option_string)
             for o in ol:
                 param = None
@@ -295,11 +286,11 @@ class TestStep:
                     param = o[2:].strip()
                 else:
                     opt, param = re.compile(r'\s+').split(o[2:], 1)
-                    if not opt in TestStep.options:
+                    if not opt in TestStepOptions:
                         raise Exception("Wrong option %s" %op)
-                if TestStep.options[opt][1] == 'int':
+                if TestStepOptions[opt][1] == 'int':
                     option_d[opt] = int(param)
-                elif TestStep.options[opt][1] == 'bool':
+                elif TestStepOptions[opt][1] == 'bool':
                     if not param:
                         option_d[opt] = True
                     else:
@@ -325,7 +316,7 @@ class TestStep:
                 #     self.options[k][2] = int(v)
                 # elif paramType == 'bool':
                 #     self.options[k][2] = bool(re.compile('T|t|Y|y').match(v))
-                self.options[k][2] = v
+                self.options[k][1] = v
             else: # should not happen
                 raise RuntimeError('ParameterType Error for option: %s' %k)
 
@@ -345,15 +336,15 @@ class TestStep:
     def execute(self):
         __tracebackhide__ = True
         self.func = self.__exe_string
-        for k in TestStep.option_priority:
+        for k in TestStepOptPriority:
             if self.options[k][0]:
-                self.func = self.options[k][1](self.options[k][2])(self.func)
+                self.func = TestStepOptions[k][2](self, self.options[k][1])(self.func)
 
         self.result = self.func()
         __ok__(self.result, self.code_string, self.err_msg)
 
-
-    def _repeat(self, seconds):
+    @classmethod
+    def _repeat(cls, obj, seconds):
         def _repeat_(func):
             def do_it(*args, **kwargs):
                 p_f = False
@@ -363,19 +354,21 @@ class TestStep:
                 while(time.time() < end_time):
                     p_f = func(*args, **kwargs)
                     loop += 1
-                    debug_info += "%d:<%s>  "%(loop, self.err_msg)
+                    debug_info += "%d:<%s>  "%(loop, obj.err_msg)
                     if p_f: break
                     time.sleep(1)
-                self.err_msg += ' - tried %d times in %d seconds'%(loop, seconds)
-                self.result = bool(p_f)
-                test_logger.debug("Results(-r %d set) { %s }"%(seconds, debug_info) )
+                obj.err_msg += ' - tried %d times in %d seconds'%(loop, seconds)
+                obj.result = bool(p_f)
+                test_logger.debug("Results(-r %d set) { %s}"%(seconds, debug_info) )
                 return p_f
 
             return do_it
 
         return _repeat_
 
-    def _timeout(self, seconds):
+
+    @classmethod
+    def _timeout(cls, obj, seconds):
         def _timeout_(func):
             def do_it(*args, **kwargs):
                 import threading
@@ -384,71 +377,82 @@ class TestStep:
                 t.start()
                 t.join(seconds)
                 if t.is_alive():
-                    self.err_msg += "  - Step Timeout (-w %d set)" %seconds
+                    obj.err_msg += "  - Step Timeout (-w %d set)" %seconds
                     #test_logger.debug('--v-- step did not complete in %d seconds(-t option set) --v--'%seconds)
-                    self.result = False
+                    obj.result = False
                     return False
-                else: return self.result
+                else: return obj.result
             return do_it
         return _timeout_
 
-    def _skip(self, tf):
+    @classmethod
+    def _skip(cls, obj, tf):
         def _skip_(func):
             def __skip__(*args, **kwargs):
                 if tf:
-                    self.err_msg = "  - SKIPPED (-s option set)"
-                    self.result = True
+                    obj.err_msg = "  - SKIPPED (-s option set)"
+                    obj.result = True
                     #test_logger.debug('--v-- step is not executed (due to -s option set) --v--')
                     return True
                 else: return func(*args, **kwargs)
             return __skip__
         return _skip_
 
-    def _xfail(self, tf):
+    @classmethod
+    def _xfail(cls, obj, tf):
         def _xfail_(func):
             def __xfail__(*args, **kwargs):
                 if tf:
                     ret = func(*args, **kwargs)
-                    self.result = not ret
+                    obj.result = not ret
                     #test_logger.debug('--v-- reverse the result (due to -x option set) --v--')
-                    self.err_msg += '   - Original result: %r (-x option set) ' %ret
-                    return self.result
+                    obj.err_msg += '   - Original result: %r (-x option set) ' %ret
+                    return obj.result
                 else:
                     return func(*args, **kwargs)
             return __xfail__
         return _xfail_
 
-    def _warning(self, tf):
+
+    @classmethod
+    def _warning(cls, obj, tf):
         def _warn_(func):
             def __warn__(*args, **kwargs):
                 if tf:
                     ret = func(*args, **kwargs)
                     if not ret:
-                        self.result = not ret
+                        obj.result = not ret
                         test_logger.warn('--v-- condition not met (pass due to -w option set) --v--')
-                    return self.result
+                    return obj.result
                 else:
                     return func(*args, **kwargs)
             return __warn__
         return _warn_
 
-    def _duration(self, seconds):
+    @classmethod
+    def _duration(cls, obj, seconds):
         def _duration_(func):
             def do_it(*args, **kwargs):
                 end_time = time.time() + seconds
                 ret = func(*args, **kwargs)
                 zzz = end_time - time.time()
                 if zzz>0: time.sleep(zzz)
-                self.err_msg += '  - sleep %d seconds (-d %d set)'% (zzz, seconds)
+                obj.err_msg += '  - sleep %d seconds (-d %d set)'% (zzz, seconds)
                 #test_logger.debug('--v-- sleep %d seconds (due to -d option set) --v--'%zzz)
-                self.result = ret
+                obj.result = ret
                 return ret
             return do_it
         return _duration_
 
 
-
-
-
-
+TestStepOptions = {
+    # options supported, [fullname, paramType, func]
+    'repeat': ['r', 'int', TestStep._repeat],
+    'timeout': ['t', 'int', TestStep._timeout],
+    'duration': ['d', 'int', TestStep._duration],
+    'skip': ['s', 'bool', TestStep._skip],
+    'xfail': ['x', 'bool', TestStep._xfail],
+    'warning': ['w', 'bool', TestStep._warning]
+}
+TestStepOptPriority = ['xfail', 'repeat', 'timeout', 'duration', 'warning', 'skip']
 
