@@ -28,6 +28,8 @@ def __init_logger__():
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
+    formatter = logging.Formatter('%(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
 
     test_logger.addHandler(fh)
     test_logger.addHandler(ch)
@@ -248,9 +250,10 @@ class TestStep:
         'timeout': ['t', 'int'],
         'duration': ['d', 'int'],
         'skip': ['s', 'bool'],
-        'xfail': ['x', 'bool']
+        'xfail': ['x', 'bool'],
+        'warning': ['w', 'bool']
     }
-    option_priority = ['xfail', 'repeat', 'timeout', 'duration', 'skip']
+    option_priority = ['xfail', 'repeat', 'timeout', 'duration', 'warning', 'skip']
 
     def __init__(self, code_string, globals, locals, **kwargs):
         self.code_string = code_string
@@ -262,6 +265,7 @@ class TestStep:
             'repeat': [False, self._repeat, 0],
             'timeout': [False, self._timeout, 30],
             'duration': [False, self._duration, 30],
+            'warning': [False, self._warning, False],
             'skip': [False, self._skip, False]
         }
         self.op_string = None
@@ -331,7 +335,9 @@ class TestStep:
         if self.op_string:
             self.expr2_val = eval(self.expr2_str, self.globals, self.locals)
             ret = _ExtOperation.operator(self.op_string)(self.expr1_val, self.expr2_val)
-            self.err_msg = "%r %s %r ?" %(self.expr1_val, self.op_string, self.expr2_val)
+            self.err_msg = "%r %s %r" %(self.expr1_val, self.op_string, self.expr2_val)
+            #test_logger.debug('--v-- %s --v--'%(self.err_msg))
+        else: self.err_msg = "%r" %(self.expr1_val)
 
         self.result = bool(ret)
         return ret
@@ -352,14 +358,17 @@ class TestStep:
             def do_it(*args, **kwargs):
                 p_f = False
                 loop = 0
+                debug_info =''
                 end_time = time.time() + seconds
                 while(time.time() < end_time):
                     p_f = func(*args, **kwargs)
                     loop += 1
+                    debug_info += "%d:<%s>  "%(loop, self.err_msg)
                     if p_f: break
                     time.sleep(1)
                 self.err_msg += ' - tried %d times in %d seconds'%(loop, seconds)
                 self.result = bool(p_f)
+                test_logger.debug("Results(-r %d set) { %s }"%(seconds, debug_info) )
                 return p_f
 
             return do_it
@@ -375,7 +384,8 @@ class TestStep:
                 t.start()
                 t.join(seconds)
                 if t.is_alive():
-                    self.err_msg += "Step Timeout"
+                    self.err_msg += "  - Step Timeout (-w %d set)" %seconds
+                    #test_logger.debug('--v-- step did not complete in %d seconds(-t option set) --v--'%seconds)
                     self.result = False
                     return False
                 else: return self.result
@@ -386,8 +396,9 @@ class TestStep:
         def _skip_(func):
             def __skip__(*args, **kwargs):
                 if tf:
-                    self.err_msg = "SKIPPED"
+                    self.err_msg = "  - SKIPPED (-s option set)"
                     self.result = True
+                    #test_logger.debug('--v-- step is not executed (due to -s option set) --v--')
                     return True
                 else: return func(*args, **kwargs)
             return __skip__
@@ -399,12 +410,27 @@ class TestStep:
                 if tf:
                     ret = func(*args, **kwargs)
                     self.result = not ret
-                    self.err_msg += '%r-Expected Fail-' %ret
+                    #test_logger.debug('--v-- reverse the result (due to -x option set) --v--')
+                    self.err_msg += '   - Original result: %r (-x option set) ' %ret
                     return self.result
                 else:
                     return func(*args, **kwargs)
             return __xfail__
         return _xfail_
+
+    def _warning(self, tf):
+        def _warn_(func):
+            def __warn__(*args, **kwargs):
+                if tf:
+                    ret = func(*args, **kwargs)
+                    if not ret:
+                        self.result = not ret
+                        test_logger.warn('--v-- condition not met (pass due to -w option set) --v--')
+                    return self.result
+                else:
+                    return func(*args, **kwargs)
+            return __warn__
+        return _warn_
 
     def _duration(self, seconds):
         def _duration_(func):
@@ -413,7 +439,8 @@ class TestStep:
                 ret = func(*args, **kwargs)
                 zzz = end_time - time.time()
                 if zzz>0: time.sleep(zzz)
-                self.err_msg += 'sleep %d seconds'% zzz
+                self.err_msg += '  - sleep %d seconds (-d %d set)'% (zzz, seconds)
+                #test_logger.debug('--v-- sleep %d seconds (due to -d option set) --v--'%zzz)
                 self.result = ret
                 return ret
             return do_it

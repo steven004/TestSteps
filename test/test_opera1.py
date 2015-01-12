@@ -39,16 +39,17 @@ def test_2():
 def test_3step():
     step("'ok'> '5'")
     #step("3 == 5")
-    #step("wait()", timeout = 6, xfail = True)
+    step("wait()", timeout=6, xfail = True, warning=True)
     step("3+6 == 9", duration = 4)
-    step("4 == 6", skip = True, duration=10)
+    step("4 == 6", skip = True, duration=10, warning=True)
     step("abs(4-3) == 1")
-    step("4 == 5", repeat=3)
+    step("4 == 5", repeat=3, warning=True)
 
 def test_4steps():
     steps("""
         'ok'> '5'
         3+6 == 9  -d 4
+        3 == 5 -w
         4 == 6  -x
         abs(4-3) == 1
         4 == 5  --repeat 3
@@ -57,5 +58,5 @@ def test_4steps():
 if __name__ == '__main__' :
     #test_1()
     #test_2()
-    #test_3step()
+    test_3step()
     test_4steps()
