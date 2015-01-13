@@ -52,11 +52,14 @@ def test_4steps():
         3 == 5 -w
         4 == 6  -x
         abs(4-3) == 1
+        9 > 0/0  -e ZeroDivisionError
+        9 < 0/0  -e Exception
+        9 == 0/0 -e SyntaxError
         4 == 5  --repeat 3
         """)
 
 if __name__ == '__main__' :
     #test_1()
-    #test_2()
-    test_3step()
+    test_2()
+    #test_3step()
     test_4steps()

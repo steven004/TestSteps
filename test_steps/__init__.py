@@ -26,7 +26,7 @@ def __init_logger__():
     fh = logging.FileHandler('/tmp/test_step.log')
     ch = logging.StreamHandler()
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     formatter = logging.Formatter('%(levelname)s - %(message)s')
     ch.setFormatter(formatter)
@@ -69,9 +69,9 @@ class __TestLog__(object):
     def new_step(self, pf, step_info, err_msg=''):
         self.step_no += 1
         if pf:
-            self.step_logger.info("Step-%r: %s - PASS: %s" %(self.step_no, step_info, err_msg))
+            self.step_logger.info("Check-%r: %s - PASS: %s" %(self.step_no, step_info, err_msg))
         else:
-            self.step_logger.error("Step-%r: %s - FAIL: %s" %(self.step_no, step_info, err_msg))
+            self.step_logger.error("Check-%r: %s - FAIL: %s" %(self.step_no, step_info, err_msg))
 
 
 _this_file = os.path.normcase(setlogger.__code__.co_filename)
@@ -115,19 +115,23 @@ def __ok__(cond, desc, errmsg):
     return(cond, desc, errmsg)
 
 @_step_closure
-def ok(cond, desc = None):
+def ok(cond, passdesc = None, faildesc=None):
     '''
     :param cond: could be a string, when there is no desc parameter and just pass the step
     :param desc: description of this step
     :return: True when it passed
     '''
-
-    if not desc:
+    if not passdesc:
         if isinstance(cond, bool):
-            return(cond, "ok(%r)"%cond, "")
-        else: return(True, "ok(%r)"%cond, "")
-    else:
-        return(True if cond else False, desc, "")
+            passdesc = "ok(%r)" % cond
+        else: # cond is a description actually, pass anyway.
+            passdesc = cond
+            cond = True
+    if not faildesc: faildesc = passdesc
+
+    if cond:
+        return(True, passdesc, '')
+    else: return (False, passdesc, faildesc)
 
 
 @_step_closure
@@ -237,7 +241,7 @@ def steps(code_lines, globals=None, locals=None):
         else:
             half = ''
             together = False
-            code_string, options = TestStep.parse_step(ss)
+            code_string, options = TestStep.parse_steps(ss)
             step(code_string, globals, locals, **options)
 
 s = steps
@@ -257,8 +261,8 @@ class TestStep:
         #     'warning': [False, False],
         #     'skip': [False, False]
         # }
-
         self.options = dict((k, [False, None]) for k in TestStepOptions.keys())
+
         self.op_string = None
         self.err_msg = ''
         self.expr1_str, self.expr2_str = (code_string, None)
@@ -268,7 +272,7 @@ class TestStep:
         self.result = False
 
     @classmethod
-    def parse_step(cls, step_string):
+    def parse_steps(cls, step_string):
         pattern = re.compile(r'(.*)\s+(?=(?:-\w(?:\s|$)|--\w{2,}(?:\s|$)))(.*)')
         m = pattern.match(step_string)
         code_string = step_string
@@ -288,13 +292,15 @@ class TestStep:
                     opt, param = re.compile(r'\s+').split(o[2:], 1)
                     if not opt in TestStepOptions:
                         raise Exception("Wrong option %s" %op)
-                if TestStepOptions[opt][1] == 'int':
+                if TestStepOptions[opt][1] == int:
                     option_d[opt] = int(param)
-                elif TestStepOptions[opt][1] == 'bool':
+                elif TestStepOptions[opt][1] == bool:
                     if not param:
                         option_d[opt] = True
                     else:
                         option_d[opt] = bool(re.compile(r'Y|y|T|t').match(param))
+                else:
+                    option_d[opt] = eval(param)
 
         return code_string, option_d
 
@@ -447,12 +453,40 @@ class TestStep:
 
 TestStepOptions = {
     # options supported, [fullname, paramType, func]
-    'repeat': ['r', 'int', TestStep._repeat],
-    'timeout': ['t', 'int', TestStep._timeout],
-    'duration': ['d', 'int', TestStep._duration],
-    'skip': ['s', 'bool', TestStep._skip],
-    'xfail': ['x', 'bool', TestStep._xfail],
-    'warning': ['w', 'bool', TestStep._warning]
+    'repeat': ['r', int, TestStep._repeat],
+    'timeout': ['t', int, TestStep._timeout],
+    'duration': ['d', int, TestStep._duration],
+    'skip': ['s', bool, TestStep._skip],
+    'xfail': ['x', bool, TestStep._xfail],
+    'warning': ['w', bool, TestStep._warning]
 }
+
 TestStepOptPriority = ['xfail', 'repeat', 'timeout', 'duration', 'warning', 'skip']
+
+def addStepOption(long, short, paraType, func, before=None):
+    if before:
+        i = TestStepOptPriority.index(before)
+        TestStepOptPriority.insert(i, long)
+    else:
+        TestStepOptPriority.append(long)
+
+    TestStepOptions[long] = [short, paraType, func]
+
+
+def _exception(obj, exception):
+    def _exception_(func):
+        def do_it(*args, **kwargs):
+            try:
+                func(*args, **kwargs)
+            except exception:
+                obj.result = True
+                obj.err_msg = ' - exception: %r caught'%exception
+            else:
+                obj.result = False
+                obj.err_msg = ' - exception: %r not caught'%exception
+            return obj.result
+        return do_it
+    return _exception_
+
+addStepOption('exception', 'e', Exception, _exception, 'xfail')
 
