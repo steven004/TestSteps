@@ -1,3 +1,13 @@
+
+
+v0.2.0
+-------------------------------------------
+* added debug info logging
+* added -e and -w option for exception and warning
+* add a mechanism for new option insertion
+* enhanced the ok function
+
+
 v0.1
 -------------------------------------------
 
