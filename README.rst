@@ -14,6 +14,7 @@ which are not supported in most of the current python test frames.
 All the step and logging functions can be used independently, or be used in test frameworks
 as py.test or nose
 
+
 Install test_steps
 ------------------
 
@@ -30,29 +31,37 @@ Example for using simple-step functions
     from test_steps import *
     def test_example()
         ok("just pass the step and log it")
-        fail("Just fail the step and log it")
+        #fail("Just fail the step and log it")
         ok(3+2 == 5, "pass if expr else fail")
-        eq("Shanghai", "Beijing", "Shanghai not equal to Beijing")
-        eq(4+5, 9, "4+5 == 9?")
+        #eq("Shanghai", "Beijing", "Shanghai not equal to Beijing")
+        eq(4+5, 9)
         ne("Shanghai", "Beijing", "Pass, Shanghai not equal to Beijing")
-        match("Shanghai City", "City", "Pass, contains, the second parameter could be regex")
+        #'Shanghai City' contains 'Country', the second parameter could be regex
+        match("Shanghai City", "Country")
         unmatch("Shanghai City", "Country", "Pass, not contains, regex can be used too")
 
-More functions: lt, gt, more can be added, a hook can be designed to adding more
+More functions: lt, gt, more operators/functions can be added, see the section:
+add more operators/step functions via 3 steps
+
 
 Logging of the steps
 --------------------
 If the log_level is set to INFO, and you added the data-time format to it,
 the logging of the execution of test_example() case would be like::
 
-    2014-05-06 12:54:43,222 - Case - INFO - test_example in file ... (filename)
-    2014-05-06 12:54:43,223 - Step - INFO - (1) just pass the step and log it
-    2014-05-06 12:54:43,224 - Step - ERROR - (2) Just fail the step and log it
-    ... ...
+    2015-01-10 20:43:22,787 - Test - INFO - ------------------------------------------------------
+    2015-01-10 20:43:22,788 - Test - INFO - Case test_example in file: /Users/Steven004/test/demo.py
+    2015-01-10 20:43:22,788 - Test - INFO - Step-1: just pass the step and log it - PASS:
+    2015-01-10 20:43:26,789 - Test - INFO - Step-2: pass if expr else fail - PASS:
+    2015-01-10 20:43:26,789 - Test - INFO - Step-3: 9 == 9 - PASS:
+    2015-01-10 20:43:26,789 - Test - INFO - Step-4: Pass, Shanghai not equal to Beijing - PASS:
+    2015-01-10 20:43:29,792 - Test - ERROR - Step-5: "Shanghai City" =~ "Country" - FAIL: "Shanghai City" =~ "Country"?
+
 
 The log-level can be setting, and logging handler can be set by the user, as all you
 can do for standard logging.
 If a step function is in a loop, there will be multiple steps logged.
+
 
 Advanced step functions
 -----------------------
@@ -75,7 +84,11 @@ Supported optional args in step::
     - repeat: e.g. repeat=20, repeat in another second if fail until pass, timeout in 20s
     - duration: e.g. duration=15, stay in this step for 15 seconds, even it completed shortly
     - xfail: e.g. xfail=True, expected failure, report pass when fail, vice versa
+    - warning: e.g. warning=True, Pass the step anyway, but log a warning message if the condition is not met
     - skip: e.g. skip=True, just skip this case.
+
+Please be noticed that for any step fails, the test will be terminated (in py.test or other test framework,
+the current case will be terminated), unless you set *warning* option for it.
 
 
 Examples:
@@ -93,6 +106,16 @@ Examples:
     step("cars.averagespeed() > 50 ", globals = shanghai.__dict__)
 
 
+Not as the other step functions (eq, ne, ...), the step/steps functions just use operator to
+write the steps in a string. The mapping of operators and step functions::
+
+    == : eq         != : ne         > : gt      < : lt      >= : ge     <= : le
+    =~ : match      !~ : unmatch
+
+
+*steps* is another way to write steps in one statement. When the function steps (or s) is used,
+the format is a little bit different. It uses command-arguments-like format. And you can set the
+name spaces in one shot for all the steps in the code string.
 The following code has the same function as the 3 first 3 steps in the code above
 
 .. code-block:: python
@@ -103,11 +126,14 @@ The following code has the same function as the 3 first 3 steps in the code abov
         num_async.get_value() == 500    -r 20   -x
         ''')
 
-Not as the other step functions (eq, ne, ...), the step/steps functions just use operator to
-write the steps in a string. The mapping of operators and step functions::
+Options in steps(or s) ::
 
-    == : eq         != : ne         > : gt      < : lt      >= : ge     <= : le
-    =~ : match      !~ : unmatch
+    -t 30   or --timeout 30    in steps()             means           timeout=30    in step()
+    -r 10   or --repeat  10    in steps()             means           repeat=10
+    -d 10   or --duration 10                          means           duration=10
+    -x  or --xfail or -x True or --xfail True         means           xfail=True
+    -w  or --warning  or -w True  or --warning True   means           warning=True
+    -s  or --skip     or -s True  or --skip True      means           skip=True
 
 
 Add more operators/step functions via 3 steps
@@ -116,7 +142,8 @@ For different product, or scenarios, some other operation you may want to define
 for logging, it's easy based on this framework.
 
 1. Define a comparing function for two objects, e.g., to compare to date string
-    .. code-block:: python
+
+.. code-block:: python
 
     ##  compDate('1/4/2015', '01-04-2015') return True
     def compDate(date1, date2):
@@ -128,15 +155,18 @@ for logging, it's easy based on this framework.
         day2, month2, year2 = (int(i) for i in match2.group(1,2,3))
         return (year1==year2) and (month1==month2) and (day1==day2)
 
+
 #. Register it into the test_steps framework:
-    .. code-block:: python
+
+.. code-block:: python
 
     # bind the compDate function with '=d=' operator
     # After this step, you can directly use the operator in step/steps/s functions
     addBiOperator('=d=', compDate)
 
 #. Get the opWapperFunction
-    .. code-block:: python
+
+.. code-block:: python
 
     sameDate = getOpWrapper('=d=')
 

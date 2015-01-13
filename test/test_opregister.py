@@ -24,7 +24,6 @@ def setup():
     addBiOperator('=f=', lambda o1, o2: abs(o1 - o2) < 1.0e-6)
     feq = getOpWrapper('=f=')
 
-
 def test_3():
     eq(3+5, 8)
     ok("ok step")
