@@ -24,7 +24,8 @@ __tracebackhide__ = True
 def __init_logger__():
     global test_logger
 
-    fh = logging.FileHandler('/tmp/test_step.log')
+    file_name = time.strftime('/tmp/test'+"_%Y_%m_%d_%H_%M_%S.log")
+    fh = logging.FileHandler(file_name)
     ch = logging.StreamHandler()
 
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -73,14 +74,26 @@ class __TestLog__(object):
     def new_step(self, pf, step_info, err_msg=''):
         self.step_no += 1
         if pf:
-            self.step_logger.info("Check-%r: %s - PASS - %s" % (self.step_no, step_info, err_msg))
+            self.step_logger.info("Check-%r: %s -PASS- %s" % (self.step_no, step_info, err_msg))
         else:
-            self.step_logger.error("Check-%r: %s - FAIL - %s" % (self.step_no, step_info, err_msg))
+            self.step_logger.error("Check-%r: %s -FAIL- %s" % (self.step_no, step_info, err_msg))
 
 
 _this_file = os.path.normcase(setlogger.__code__.co_filename)
 __step_info__ = __TestLog__()
 __init_logger__()
+
+
+def _invoker():
+    f = currentframe()
+    while hasattr(f, "f_code"):
+        co = f.f_code
+        filename = os.path.normcase(co.co_filename)
+
+        if filename != _this_file:
+            return f
+        f = f.f_back
+    else: raise RuntimeError("no code for the frame, why?")
 
 
 def _step_closure(func):
@@ -93,24 +106,26 @@ def _step_closure(func):
 
     def __step__(*args, **kwargs):
         __tracebackhide__ = True
-        # Get current the caller of this function
-        f = currentframe().f_back
-        while hasattr(f, "f_code"):
-            co = f.f_code
-            filename = os.path.normcase(co.co_filename)
-            if filename == _this_file:
-                f = f.f_back
-                continue
+        # Get current the caller of this function outside this file
+        # f = currentframe().f_back
+        # while hasattr(f, "f_code"):
+        #     co = f.f_code
+        #     filename = os.path.normcase(co.co_filename)
+        #     if filename == _this_file:
+        #         f = f.f_back
+        #         continue
 
-            if co != __step_info__.case_obj:
-                __step_info__.new_case(co)
-            break
+        co = _invoker().f_code
+        if co != __step_info__.case_obj:
+            __step_info__.new_case(co)
+        #break
 
         # Get the step message
         (pf, step_info, err_msg) = func(*args, **kwargs)
         __step_info__.new_step(pf, step_info, err_msg)
         if not pf:
-            raise TestStepFail(func.__name__, step_info, err_msg)
+            #raise TestStepFail(func.__name__, step_info, err_msg)
+            raise TestStepFail(step_info, err_msg)
 
     return (__step__)
 
@@ -207,9 +222,9 @@ getOpWrapper = lambda op_string: _bi_comp_closure(op_string)
 ## To add the =~ and !~ operator
 # match = BiOpRegister('=~', lambda o1, o2: re.compile(o2).match(o1))
 # unmatch = BiOpRegister( '!~', lambda o1, o2: not re.compile(o2).match(o1) )
-addBiOperator('=~', lambda o1, o2: re.compile(o2).match(o1))
+addBiOperator('=~', lambda o1, o2: re.compile(o2).search(o1))
 match = getOpWrapper('=~')
-addBiOperator('!~', lambda o1, o2: not re.compile(o2).match(o1))
+addBiOperator('!~', lambda o1, o2: not re.compile(o2).search(o1))
 unmatch = getOpWrapper('!~')
 
 
@@ -222,7 +237,7 @@ def step(code_string, globals=None, locals=None, **kwargs):
     if len(step_string) == 0: return
     if step_string[0] == '#': return
     if not globals:
-        invoker = currentframe().f_back
+        invoker = _invoker()
         globals = invoker.f_globals
         locals = invoker.f_locals
     curStep = TestStep(step_string, globals, locals, **kwargs)
@@ -241,10 +256,10 @@ def step(code_string, globals=None, locals=None, **kwargs):
 def steps(code_lines, globals=None, locals=None, batch=False):
     __tracebackhide__ = True
     step_list = code_lines.split('\n')
-    if not globals:
-        invoker = currentframe().f_back
-        globals = invoker.f_globals
-        locals = invoker.f_locals
+    # if not globals:
+    #     invoker = currentframe().f_back
+    #     globals = invoker.f_globals
+    #     locals = invoker.f_locals
     together = False
     half = ''
     line_no = 0

@@ -1,4 +1,11 @@
 
+v0.3.0
+-------------------------------------------
+* add passdesc (-p) and faildesc (-f) option for step/check function
+* add check/checks as alias for step/steps
+* add the return values for step and steps function
+* add a batch parameter to steps/checks function
+
 
 v0.2.0
 -------------------------------------------
