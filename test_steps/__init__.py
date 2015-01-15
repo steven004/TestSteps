@@ -159,7 +159,7 @@ def _bi_comp_closure(op):
 
         err_msg = "%r %s %r?" % (o1, op, o2)
         if func(o1, o2):
-            return (True, passdesc, "")
+            return (True, passdesc, err_msg)
         else:
             return (False, faildesc, err_msg)
 
@@ -229,6 +229,14 @@ def step(code_string, globals=None, locals=None, **kwargs):
     curStep.parse()
     curStep.execute()
 
+    # Return a dictionary to the invoker for information
+    values = [curStep.expr1_val]
+    if curStep.expr2_val != None: values.append(curStep.expr2_val)
+    return {'values': values,
+            'exception': curStep.exception,
+            'info': curStep.err_msg,
+            'result': curStep.result}
+
 
 def steps(code_lines, globals=None, locals=None, batch=False):
     __tracebackhide__ = True
@@ -242,6 +250,7 @@ def steps(code_lines, globals=None, locals=None, batch=False):
     line_no = 0
     step_no = 0
     failed_steps =[]
+    step_results = []
     for full_string in step_list:
         line_no += 1
         ss = full_string.strip()
@@ -259,7 +268,7 @@ def steps(code_lines, globals=None, locals=None, batch=False):
             together = False
             try:
                 code_string, options = TestStep.parse_steps(ss)
-                step(code_string, globals, locals, **options)
+                step_res = step(code_string, globals, locals, **options)
             except Exception as e:
                 if not batch: raise e
                 test_logger.debug("%d: %s - FAIL - %r" % (line_no, code_string, e))
@@ -267,10 +276,13 @@ def steps(code_lines, globals=None, locals=None, batch=False):
                                      'step': step_no,
                                      'code': code_string,
                                      'exception': e})
+        step_results.append(step_res)
 
     if len(failed_steps):
         __ok__(False, '%d checks failed' % len(failed_steps),
                '1st failed step: %d %s' % (line_no, failed_steps[0]['code']))
+    return {'result': True,
+            'step_results': step_results}
 
 
 s = steps
@@ -299,6 +311,7 @@ class TestStep:
         self.func = None
         self.pass_str = self.fail_str = code_string
         self.result = False
+        self.exception = None
 
     @classmethod
     def parse_steps(cls, step_string):
@@ -524,9 +537,10 @@ def _exception(obj, exception):
         def do_it(*args, **kwargs):
             try:
                 func(*args, **kwargs)
-            except exception:
+            except exception as e:
                 obj.result = True
                 obj.err_msg = ' - exception: %r caught' % exception
+                obj.exception = e
             else:
                 obj.result = False
                 obj.err_msg = ' - exception: %r not caught' % exception
