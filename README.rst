@@ -49,13 +49,13 @@ Logging of the steps
 If the log_level is set to INFO, and you added the data-time format to it,
 the logging of the execution of test_example() case would be like::
 
-    2015-01-10 20:43:22,787 - Test - INFO - ------------------------------------------------------
-    2015-01-10 20:43:22,788 - Test - INFO - Case test_example in file: /Users/Steven004/test/demo.py
-    2015-01-10 20:43:22,788 - Test - INFO - Step-1: just pass the step and log it - PASS:
-    2015-01-10 20:43:26,789 - Test - INFO - Step-2: pass if expr else fail - PASS:
-    2015-01-10 20:43:26,789 - Test - INFO - Step-3: 9 == 9 - PASS:
-    2015-01-10 20:43:26,789 - Test - INFO - Step-4: Pass, Shanghai not equal to Beijing - PASS:
-    2015-01-10 20:43:29,792 - Test - ERROR - Step-5: "Shanghai City" =~ "Country" - FAIL: "Shanghai City" =~ "Country"?
+    2015-01-10 20:43:22,787 - INFO - ------------------------------------------------------
+    2015-01-10 20:43:22,788 - INFO - Func test_example in file: /Users/Steven004/test/demo.py
+    2015-01-10 20:43:22,788 - INFO - Check-1: just pass the step and log it - PASS:
+    2015-01-10 20:43:26,789 - INFO - Check-2: pass if expr else fail - PASS:
+    2015-01-10 20:43:26,789 - INFO - Check-3: 9 == 9 - PASS:
+    2015-01-10 20:43:26,789 - INFO - Check-4: Pass, Shanghai not equal to Beijing - PASS:
+    2015-01-10 20:43:29,792 - ERROR - Check-5: "Shanghai City" =~ "Country" - FAIL: "Shanghai City" =~ "Country"?
 
 
 The log-level can be setting, and logging handler can be set by the user, as all you
@@ -86,6 +86,9 @@ Supported optional args in step::
     - xfail: e.g. xfail=True, expected failure, report pass when fail, vice versa
     - warning: e.g. warning=True, Pass the step anyway, but log a warning message if the condition is not met
     - skip: e.g. skip=True, just skip this case.
+    - exception: e.g. exception=NameError, expected exception will be raised. pass if so, or fail
+    - passdesc: e.g. passdesc="the string to log if passed" (replace the code_string in the log)
+    - faildesc: e.g. faildesc="the string to log if failed" (replace the code_string in the log)
 
 Please be noticed that for any step fails, the test will be terminated (in py.test or other test framework,
 the current case will be terminated), unless you set *warning* option for it.
@@ -104,6 +107,7 @@ Examples:
     step("num_async.get_value() == 500", repeat = 20, xfail = True)
     # Run code_string in a particular name space, here, to run code string in shanghai object's name space
     step("cars.averagespeed() > 50 ", globals = shanghai.__dict__)
+    step("1/0", exception=ZeroDivisionError, passdesc='Pass, expected to have the ZeroDivisionError')
 
 
 Not as the other step functions (eq, ne, ...), the step/steps functions just use operator to
@@ -128,20 +132,22 @@ The following code has the same function as the 3 first 3 steps in the code abov
 
 Options in steps(or s) ::
 
-    -t 30   or --timeout 30    in steps()             means           timeout=30    in step()
-    -r 10   or --repeat  10    in steps()             means           repeat=10
-    -d 10   or --duration 10                          means           duration=10
-    -x  or --xfail or -x True or --xfail True         means           xfail=True
-    -w  or --warning  or -w True  or --warning True   means           warning=True
-    -s  or --skip     or -s True  or --skip True      means           skip=True
-
+    -t 30   or --timeout 30    in steps()             means       timeout=30    in step()
+    -r 10   or --repeat  10    in steps()             means       repeat=10
+    -d 10   or --duration 10                          means       duration=10
+    -x  or --xfail or -x True or --xfail True         means       xfail=True
+    -w  or --warning  or -w True  or --warning True   means       warning=True
+    -s  or --skip     or -s True  or --skip True      means       skip=True
+    -e MyException                                    means       exception=MyException
+    -p pass_str or --passdesc pass_str                means       passdesc=pass_str
+    -f fail_str or --faildesc fail_str                means       faildesc=fail_str
 
 Add more operators/step functions via 3 steps
 ---------------------------------------------
 For different product, or scenarios, some other operation you may want to define and add them
 for logging, it's easy based on this framework.
 
-1. Define a comparing function for two objects, e.g., to compare to date string
+1. Define a comparing function for two expressions, e.g., to compare to date string
 
 .. code-block:: python
 
@@ -156,7 +162,7 @@ for logging, it's easy based on this framework.
         return (year1==year2) and (month1==month2) and (day1==day2)
 
 
-#. Register it into the test_steps framework:
+2. Register it into the test_steps framework:
 
 .. code-block:: python
 
@@ -164,7 +170,7 @@ for logging, it's easy based on this framework.
     # After this step, you can directly use the operator in step/steps/s functions
     addBiOperator('=d=', compDate)
 
-#. Get the opWapperFunction
+3. Get the opWapperFunction
 
 .. code-block:: python
 
@@ -198,7 +204,7 @@ You can set your own logger for your test as below:
 
 .. code-block:: python
 
-    test_steps.setlogger(your_logger)
+    setlogger(your_logger)
     # your_logger could be a logging object, or any object which support methods like info, error, ...
 
 Or, you can directly config or format the test_logger, just as you do for a normal logging object.
