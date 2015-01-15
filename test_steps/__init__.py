@@ -230,7 +230,7 @@ def step(code_string, globals=None, locals=None, **kwargs):
     curStep.execute()
 
 
-def steps(code_lines, globals=None, locals=None):
+def steps(code_lines, globals=None, locals=None, batch=False):
     __tracebackhide__ = True
     step_list = code_lines.split('\n')
     if not globals:
@@ -239,7 +239,11 @@ def steps(code_lines, globals=None, locals=None):
         locals = invoker.f_locals
     together = False
     half = ''
+    line_no = 0
+    step_no = 0
+    failed_steps =[]
     for full_string in step_list:
+        line_no += 1
         ss = full_string.strip()
         if len(ss) == 0: continue
         if ss[0] == '#': continue
@@ -250,10 +254,23 @@ def steps(code_lines, globals=None, locals=None):
             together = True
             continue
         else:
+            step_no += 1
             half = ''
             together = False
-            code_string, options = TestStep.parse_steps(ss)
-            step(code_string, globals, locals, **options)
+            try:
+                code_string, options = TestStep.parse_steps(ss)
+                step(code_string, globals, locals, **options)
+            except Exception as e:
+                if not batch: raise e
+                test_logger.debug("%d: %s - FAIL - %r" % (line_no, code_string, e))
+                failed_steps.append({'line': line_no,
+                                     'step': step_no,
+                                     'code': code_string,
+                                     'exception': e})
+
+    if len(failed_steps):
+        __ok__(False, '%d checks failed' % len(failed_steps),
+               '1st failed step: %d %s' % (line_no, failed_steps[0]['code']))
 
 
 s = steps
