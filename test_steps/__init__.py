@@ -24,7 +24,7 @@ __tracebackhide__ = True
 def __init_logger__():
     global test_logger
 
-    file_name = time.strftime('/tmp/test'+"_%Y_%m_%d_%H_%M_%S.log")
+    file_name = time.strftime('/tmp/test'+"_%Y%m%d_%H%M.log")
     fh = logging.FileHandler(file_name)
     ch = logging.StreamHandler()
 
@@ -286,7 +286,7 @@ def steps(code_lines, globals=None, locals=None, batch=False):
                 step_res = step(code_string, globals, locals, **options)
             except Exception as e:
                 if not batch: raise e
-                test_logger.debug("%d: %s - FAIL - %r" % (line_no, code_string, e))
+                test_logger.debug("    ^^^ %d: %s - FAIL - %r   ^^^" % (line_no, code_string, e))
                 failed_steps.append({'line': line_no,
                                      'step': step_no,
                                      'code': code_string,
@@ -294,8 +294,8 @@ def steps(code_lines, globals=None, locals=None, batch=False):
         step_results.append(step_res)
 
     if len(failed_steps):
-        __ok__(False, '%d checks failed' % len(failed_steps),
-               '1st failed step: %d %s' % (line_no, failed_steps[0]['code']))
+        __ok__(False, 'Overall Batch Result: %d checks failed' % len(failed_steps),
+               '1st failed step: (line_%d) %s' % (line_no, failed_steps[0]['code']))
     return {'result': True,
             'step_results': step_results}
 
@@ -327,10 +327,12 @@ class TestStep:
         self.pass_str = self.fail_str = code_string
         self.result = False
         self.exception = None
+        self.warn_msg = None
+        self.debug_msg = None
 
     @classmethod
     def parse_steps(cls, step_string):
-        pattern = re.compile(r'(.*)\s+(?=(?:-\w(?:\s|$)|--\w{2,}(?:\s|$)))(.*)')
+        pattern = re.compile(r'(.*?)\s+(?=(?:-\w(?:\s|$)|--\w{2,}(?:\s|$)))(.*)')
         m = pattern.match(step_string)
         code_string = step_string
         option_d = {}
@@ -407,6 +409,10 @@ class TestStep:
         self.result = self.func()
         step_description = self.pass_str if self.result else self.fail_str
         __ok__(self.result, step_description, self.err_msg)
+        if self.warn_msg:
+            test_logger.warning(self.warn_msg)
+        if self.debug_msg:
+            test_logger.debug(self.debug_msg)
 
     @classmethod
     def _repeat(cls, obj, seconds):
@@ -424,7 +430,8 @@ class TestStep:
                     time.sleep(1)
                 obj.err_msg += ' - tried %d times in %d seconds' % (loop, seconds)
                 obj.result = bool(p_f)
-                test_logger.debug("Results(-r %d set) { %s}" % (seconds, debug_info))
+                #obj.debug_msg = "Results(-r %d set) { %s}" % (seconds, debug_info)
+                test_logger.debug("   vvv  Results(-r %d set) { %s}  vvv" % (seconds, debug_info))
                 return p_f
 
             return do_it
@@ -443,7 +450,7 @@ class TestStep:
                 t.start()
                 t.join(seconds)
                 if t.is_alive():
-                    obj.err_msg += "  - Step Timeout (-w %d set)" % seconds
+                    obj.err_msg += "  - Step Timeout (-t %d set)" % seconds
                     #test_logger.debug('--v-- step did not complete in %d seconds(-t option set) --v--'%seconds)
                     obj.result = False
                     return False
@@ -477,7 +484,7 @@ class TestStep:
                 if tf:
                     ret = func(*args, **kwargs)
                     obj.result = not ret
-                    #test_logger.debug('--v-- reverse the result (due to -x option set) --v--')
+                    test_logger.debug('    vvv  reverse the result (due to -x option set)  vvv')
                     obj.err_msg += '   - Original result: %r (-x option set) ' % ret
                     return obj.result
                 else:
@@ -496,7 +503,8 @@ class TestStep:
                     ret = func(*args, **kwargs)
                     if not ret:
                         obj.result = not ret
-                        test_logger.warn('--v-- condition not met (pass due to -w option set) --v--')
+                        #test_logger.warn('--v-- condition not met (pass due to -w option set) --v--')
+                        obj.warn_msg = '  ^^^  condition not met (pass due to -w option set)  ^^^ '
                     return obj.result
                 else:
                     return func(*args, **kwargs)
@@ -514,7 +522,7 @@ class TestStep:
                 zzz = end_time - time.time()
                 if zzz > 0: time.sleep(zzz)
                 obj.err_msg += '  - sleep %d seconds (-d %d set)' % (zzz, seconds)
-                #test_logger.debug('--v-- sleep %d seconds (due to -d option set) --v--'%zzz)
+                # test_logger.debug('--v-- sleep %d seconds (due to -d option set) --v--'%zzz)
                 obj.result = ret
                 return ret
 

@@ -49,7 +49,7 @@ def test_basic():
 
 ########################################################################################
 # Program stop on a failed step. (if you want it continue, see more lessons)
-# See lesson 2 to get more powerful functions
+# See the next case test_check() to get know how check function works
 ########################################################################################
 
 
@@ -57,7 +57,7 @@ def test_basic():
 def test_check():
     test_logger.info("To show the check auto-log functions")
     ## check("expr1 op expr2", globals=globals(), locals=locals(), **kwargs)
-    ## **kwargs will be reached in next lessons
+    ## **kwargs will be talked about in lesson 3
     check("my_add(3,4,5) == my_mul(3,4)", passdesc="3+4+5 == 3*4")
     check("my_add(3,4,6) != 12")
     check("my_add(3,4,5) > 10")
@@ -66,6 +66,7 @@ def test_check():
     check("3 > 5")
 
 ## The following logging information will be auto-logged in log file when running the test_check
+## The default log file is '/tmp/test_yyyymmdd_hhmm.log'
 '''
 2015-01-15 20:09:13,754 - INFO - To show the check auto-log functions
 2015-01-15 20:09:13,755 - INFO - ------------------------------------------------------
@@ -77,8 +78,10 @@ def test_check():
 2015-01-15 20:09:13,758 - INFO - Check-5: 'I ate an apple' !~ r'banana|orange' - PASS - 'I ate an apple' !~ 'banana|orange'
 2015-01-15 20:09:13,758 - ERROR - Check-6: 3 > 5 - FAIL - 3 > 5
 '''
-## Compare to the test_basic, you can see the code_string is recorded automatically. 
-## There are more information provided using check/step function.
+#######################################################################################################
+## Compare to the test_basic, you can see the code_string is recorded automatically.
+##   btw, you can use step(), which totally equals to check()
+## There are more information provided using check/step function with options.
 ## If the check/step just provide this functions, that is not so useful. 
 ## However, the real power of check/step function is not just like this, see lesson 3 for check options
 
