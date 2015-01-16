@@ -1,4 +1,10 @@
 
+v0.4.0
+-------------------------------------------
+* add lesson 5 example for checks batch argument
+* fix issue #12: multiple options for checks error
+
+
 v0.3.0
 -------------------------------------------
 * add passdesc (-p) and faildesc (-f) option for step/check function

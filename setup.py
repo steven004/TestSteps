@@ -1,5 +1,6 @@
 
 from setuptools import setup, find_packages
+import test_steps
 
 setup(
     name='test_steps',
@@ -18,7 +19,7 @@ setup(
         "Topic :: Utilities",
         "Programming Language :: Python :: 3"
     ],
-    version='0.3.7',
+    version=test_steps.__version__,
     url = "https://github.com/steven004/TestSteps",
     packages = find_packages(),
     include_package_data = True,
