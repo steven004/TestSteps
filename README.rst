@@ -7,7 +7,7 @@ Test Steps functions for each assertion and automatic logging
 .. image:: https://pypip.in/d/test_steps/badge.png
     :target: https://crate.io/packages/test_steps/
 
-TestSteps is to implement a bunch of functions about test checks and logging.
+test_steps is to implement a bunch of functions about test checks and logging.
 The purpose is to simplify the assertion and automatically logging the checks,
 which are not supported in most of the current python test frames.
 
@@ -38,6 +38,8 @@ https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson3_op
 lesson 4 - the checks functions - another format for multiple check(s):
 https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson4_checks.py
 
+lesson 5 - checks with batch argument (not stop when one check fail):
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson5_batch_option.py
 
 
 Example for using simple-step functions

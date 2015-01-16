@@ -81,7 +81,6 @@ def test_checks_batch():
 2015-01-17 17:30:13,446 - INFO - Check-7: my_mul(4,5)*5 == 0 -PASS-   - SKIPPED (-s option set)
 2015-01-17 17:30:18,449 - DEBUG -    vvv  Results(-r 5 set) { 1:<7 >= 11>  2:<7 >= 11>  3:<7 >= 11>  4:<7 >= 11>  5:<7 >= 11>  }  vvv
 2015-01-17 17:30:18,450 - ERROR - Check-8: my_add(3,4) >= 11 -FAIL- 7 >= 11 - tried 5 times in 5 seconds
-2015-01-17 17:30:18,450 - DEBUG -     ^^^ 9: my_add(3,4) >= 11 - FAIL - TestStepFail('my_add(3,4) >= 11', '7 >= 11 - tried 5 times in 5 seconds')   ^^^
 2015-01-17 17:30:18,450 - ERROR - Check-9: Overall Batch Result: 2 checks failed -FAIL- 1st failed step: (line_10) my_mul(3,4,5) > 20
 '''
 

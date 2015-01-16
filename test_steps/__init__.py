@@ -8,6 +8,7 @@ like py.test or nose
 """
 
 __author__ = 'Steven LI'
+__version__ = '0.4.0'
 
 import logging
 import os, re, time
