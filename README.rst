@@ -23,6 +23,23 @@ Install test_steps
     pip install test_steps
 
 
+Lessons with examples
+---------------------
+
+lesson 1 - the basic auto-log boolean functions:
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson1_autolog.py
+
+lesson 2 - the check function with auto-log string:
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson2_check.py
+
+lesson 3 - the check functions with options:
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson3_options.py
+
+lesson 4 - the checks functions - another format for multiple check(s):
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson4_checks.py
+
+
+
 Example for using simple-step functions
 ---------------------------------------
 

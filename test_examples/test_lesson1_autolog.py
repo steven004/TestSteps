@@ -31,6 +31,8 @@ def test_basic():
     fail("Just fail and log. nothing more")
 
 ## The following logging information will be auto-logged in log file when running the test_basic
+## The default log file is '/tmp/test_yyyymmdd_hhmm.log'
+##
 '''
 2015-01-15 20:09:13,731 - INFO - To show the basic auto-log functions
 2015-01-15 20:09:13,746 - INFO - ------------------------------------------------------
@@ -47,8 +49,8 @@ def test_basic():
 '''
 
 ########################################################################################
-# Program stop on a failed step. (if you want it continue, see more lessons)
-# See lesson 2 to get more powerful functions
+# Program stop on a failed step. (if you want it continue, take more lessons)
+# Take lesson 2 to get more powerful functions
 ########################################################################################
 
 

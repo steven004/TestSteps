@@ -65,6 +65,7 @@ def test_check_options():
 
 ##########################################################################
 ### checks is another functions to do a bundle execution of check(s)
+## You can use steps(), which totally equals to checks(), just another name
 def test_checks_options():
     test_logger.info("To show the check with options functions")
     ## same functions as test_check_options
@@ -80,6 +81,8 @@ def test_checks_options():
     ''')
 
 ##### The similar log, same execution, but code looks cleaner, and easier to review.
+## The default log file is '/tmp/test_yyyymmdd_hhmm.log
+##
 '''
 2015-01-15 20:53:37,330 - INFO - To show the check with options functions
 2015-01-15 20:53:40,332 - INFO - ------------------------------------------------------
@@ -96,6 +99,31 @@ def test_checks_options():
 2015-01-15 20:53:51,675 - DEBUG - Results(-r 5 set) { 1:<7 >= 11>  2:<7 >= 11>  3:<7 >= 11>  4:<7 >= 11>  5:<7 >= 11>  }
 2015-01-15 20:53:51,676 - ERROR - Check-8: my_add(3,4) >= 11 -FAIL- 7 >= 11 - tried 5 times in 5 seconds
 '''
+
+################################################################################
+# in checks() function, we have a command-option-style option input, which is different than in check()
+#
+# you can use short or long prefix option as indicated below:
+
+#  -------- in checks() ----------                             ----in check() -----
+#   -t 30   or --timeout 30                           means       timeout=30
+#   -r 10   or --repeat  10                           means       repeat=10
+#   -d 10   or --duration 10                          means       duration=10
+#   -x  or --xfail or -x True or --xfail True         means       xfail=True
+#   -w  or --warning  or -w True  or --warning True   means       warning=True
+#   -s  or --skip     or -s True  or --skip True      means       skip=True
+#   -e MyException                                    means       exception=MyException
+#   -p pass_str or --passdesc pass_str                means       passdesc=pass_str
+#   -f fail_str or --faildesc fail_str                means       faildesc=fail_str
+
+
+##################################################################################
+# Sometimes, you want to continue the test even if there is one check failed, but after run all
+# the checks, you want the case fail. Then, we need to introduce the batch parameter for checks()
+# Please see lesson 5 to get more information
+##################################################################################
+
+
 
 if __name__ == '__main__':
     test_check_options()
