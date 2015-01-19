@@ -36,7 +36,7 @@ def test_basic():
 '''
 2015-01-15 20:09:13,731 - INFO - To show the basic auto-log functions
 2015-01-15 20:09:13,746 - INFO - ------------------------------------------------------
-2015-01-15 20:09:13,746 - INFO - Func test_basic in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson1_autolog.py
+2015-01-15 20:09:13,746 - INFO - Func test_basic in file: /TestSteps/test_examples/test_lesson1_autolog.py
 2015-01-15 20:09:13,746 - INFO - Check-1: 3+4+5 == 3*4 - PASS - 12 == 12?
 2015-01-15 20:09:13,746 - INFO - Check-2: 13 != 12 - PASS - 13 != 12?
 2015-01-15 20:09:13,746 - INFO - Check-3: 12 > 10 - PASS - 12 > 10?

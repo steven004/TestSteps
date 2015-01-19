@@ -7,7 +7,7 @@ Test Steps functions for each assertion and automatic logging
 .. image:: https://pypip.in/d/test_steps/badge.png
     :target: https://crate.io/packages/test_steps/
 
-test_steps is to implement a bunch of functions about test checks and logging.
+The package test_steps is to implement a bunch of functions about test checks and logging.
 The purpose is to simplify the assertion and automatically logging the checks,
 which are not supported in most of the current python test frames.
 

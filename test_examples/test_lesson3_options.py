@@ -46,7 +46,7 @@ def test_check_options():
 '''
 2015-01-17 17:07:26,548 - INFO - To show the check with options functions
 2015-01-17 17:07:29,549 - INFO - ------------------------------------------------------
-2015-01-17 17:07:29,550 - INFO - Func test_check_options in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson3_options.py
+2015-01-17 17:07:29,550 - INFO - Func test_check_options in file: /TestSteps/test_examples/test_lesson3_options.py
 2015-01-17 17:07:29,550 - INFO - Check-1: my_add(3,4,5) == my_mul(3,4) -PASS- 12 == 12  - sleep 1 seconds (-d 3 set)
 2015-01-17 17:07:29,550 - INFO - Check-2: my_add(3,4,6) == 12 -PASS- 13 == 12
 2015-01-17 17:07:29,550 - WARNING -   ^^^  condition not met (pass due to -w option set)  ^^^
