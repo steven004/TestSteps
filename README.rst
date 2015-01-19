@@ -38,8 +38,8 @@ https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson3_op
 lesson 4 - the checks functions - another format for multiple check(s):
 https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson4_checks.py
 
-lesson 5 - checks with batch argument (not stop when one check fail):
-https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson5_batch_option.py
+lesson 5 - get return from check and checks function:
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson5_return.py
 
 
 Example for using simple-step functions
