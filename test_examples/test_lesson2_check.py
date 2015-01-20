@@ -57,12 +57,14 @@ def test_basic():
 def test_check():
     test_logger.info("To show the check auto-log functions")
     ## check("expr1 op expr2", globals=globals(), locals=locals(), **kwargs)
+    ## or check("boolean expr", globals=globals(), locals=locals(), **kwargs)
     ## **kwargs will be talked about in lesson 3
     check("my_add(3,4,5) == my_mul(3,4)", passdesc="3+4+5 == 3*4")
     check("my_add(3,4,6) != 12")
     check("my_add(3,4,5) > 10")
     check("my_mul(3,4) >= 11")
     check("'I ate an apple' !~ r'banana|orange'")
+    check("isinstance('string', str)")  # one expr in code_string for check()
     check("3 > 5")
 
 ## The following logging information will be auto-logged in log file when running the test_check
@@ -76,7 +78,8 @@ def test_check():
 2015-01-15 20:09:13,757 - INFO - Check-3: my_add(3,4,5) > 10 - PASS - 12 > 10
 2015-01-15 20:09:13,757 - INFO - Check-4: my_mul(3,4) >= 11 - PASS - 12 >= 11
 2015-01-15 20:09:13,758 - INFO - Check-5: 'I ate an apple' !~ r'banana|orange' - PASS - 'I ate an apple' !~ 'banana|orange'
-2015-01-15 20:09:13,758 - ERROR - Check-6: 3 > 5 - FAIL - 3 > 5
+2015-01-15 20:09:13,758 - INFO - Check-6: isinstance('string', str) - PASS - True
+2015-01-15 20:09:13,759 - ERROR - Check-7: 3 > 5 - FAIL - 3 > 5
 '''
 #######################################################################################################
 ## Compare to the test_basic, you can see the code_string is recorded automatically.

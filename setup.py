@@ -18,12 +18,12 @@ setup(
         "Topic :: Software Development :: Quality Assurance",
         "Topic :: Software Development :: Libraries",
         "Topic :: Utilities",
-        "Topic :: System :: logging",
+        "Topic :: System :: Logging",
         "Programming Language :: Python :: 3"
     ],
     version=test_steps.__version__,
     url = "https://github.com/steven004/TestSteps",
     packages = ['test_steps'],
-    include_package_data = True,
+    #include_package_data = True,
 )
 
