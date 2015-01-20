@@ -21,7 +21,7 @@ def my_mul(*args):
 
 def test_check_options():
     test_logger.info("To show the check with options functions")
-    ## check("expr1 op expr2", globals=globals(), locals=locals(), **kwargs)
+    ## check("expr1 op expr2 _or_ boolean expr", globals=globals(), locals=locals(), **kwargs)
     ## **kwargs means options, we will see them one by one here
     # duration: the step will last at least duration seconds, sleep if return earlier
     check("my_add(3,4,5) == my_mul(3,4)", duration=3)
