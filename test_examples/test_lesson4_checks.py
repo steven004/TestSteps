@@ -44,7 +44,7 @@ def test_check_options():
 '''
 2015-01-15 20:39:57,676 - INFO - To show the check with options functions
 2015-01-15 20:40:00,678 - INFO - ------------------------------------------------------
-2015-01-15 20:40:00,678 - INFO - Func test_check_options in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson4_checks.py
+2015-01-15 20:40:00,678 - INFO - Func test_check_options in file: /TestSteps/test_examples/test_lesson4_checks.py
 2015-01-15 20:40:00,678 - INFO - Check-1: my_add(3,4,5) == my_mul(3,4) - PASS - 12 == 12  - sleep 1 seconds (-d 3 set)
 2015-01-15 20:40:00,678 - WARNING - --v-- condition not met (pass due to -w option set) --v--
 2015-01-15 20:40:00,678 - INFO - Check-2: my_add(3,4,6) == 12 - PASS - 13 == 12
@@ -86,7 +86,7 @@ def test_checks_options():
 '''
 2015-01-15 20:53:37,330 - INFO - To show the check with options functions
 2015-01-15 20:53:40,332 - INFO - ------------------------------------------------------
-2015-01-15 20:53:40,332 - INFO - Func test_check_options in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson4_checks.py
+2015-01-15 20:53:40,332 - INFO - Func test_check_options in file: /TestSteps/test_examples/test_lesson4_checks.py
 2015-01-15 20:53:40,332 - INFO - Check-1: my_add(3,4,5) == my_mul(3,4) -PASS- 12 == 12  - sleep 0 seconds (-d 3 set)
 2015-01-15 20:53:40,332 - WARNING - --v-- condition not met (pass due to -w option set) --v--
 2015-01-15 20:53:40,332 - INFO - Check-2: my_add(3,4,6) == 12 -PASS- 13 == 12
@@ -117,14 +117,53 @@ def test_checks_options():
 #   -f fail_str or --faildesc fail_str                means       faildesc=fail_str
 
 
-##################################################################################
-# Sometimes, you want to continue the test even if there is one check failed, but after run all
-# the checks, you want the case fail. Then, we need to introduce the batch parameter for checks()
-# Please see lesson 5 to get more information
-##################################################################################
+
+######################################################################################
+# the checks() function has a batch parameter (by default batch=False)
+# when batch=True, it will run all the steps no matter there is a fail or not
+# but the whole function will fail if there is one check fail in checks.
+def test_checks_batch():
+    test_logger.info("To show the check with options functions")
+    ## same functions as test_check_options
+    checks('''
+        my_add(3,4,5) == my_mul(3,4)    -d 3
+        my_add(3,4,6) == 12     -w
+        my_mul(3,4,5) > 20      -t 1
+        my_mul(2,3)/my_add() == 5   -e ZeroDivisionError
+        my_mul(2,3)*my_add(1) >= 5  -p "result is 5, pass"  -f "result <= 5"
+        my_mul(2,3)*my_add(3) < 5   -x
+        my_mul(4,5)*5 == 0  -s
+        my_add(3,4) >= 11   -r 5
+    ''', batch=True)
+
+
+## The following logging information will be auto-logged in log file when running the test_checks_batch
+## What's the difference from the case above? it executed all checks, when set batch=True
+## At the same time, additional check added for the overall batch-check, see check-9
+## if batch=False, the checks will stop on check-3, which fails in the test
+'''
+2015-01-17 17:30:01,757 - INFO - To show the check with options functions
+2015-01-17 17:30:04,759 - INFO - ------------------------------------------------------
+2015-01-17 17:30:04,759 - INFO - Func test_checks_batch in file: /TestSteps/test_examples/test_lesson4_checks.py
+2015-01-17 17:30:04,759 - INFO - Check-1: my_add(3,4,5) == my_mul(3,4) -PASS- 12 == 12  - sleep 1 seconds (-d 3 set)
+2015-01-17 17:30:04,759 - INFO - Check-2: my_add(3,4,6) == 12 -PASS- 13 == 12
+2015-01-17 17:30:04,759 - WARNING -   ^^^  condition not met (pass due to -w option set)  ^^^
+2015-01-17 17:30:05,761 - ERROR - Check-3: my_mul(3,4,5) > 20 -FAIL-   - Step Timeout (-t 1 set)
+2015-01-17 17:30:05,761 - DEBUG -     ^^^ 4: my_mul(3,4,5) > 20 - FAIL - TestStepFail('my_mul(3,4,5) > 20', '  - Step Timeout (-t 1 set)')   ^^^
+2015-01-17 17:30:07,560 - INFO - Check-4: my_mul(2,3)/my_add() == 5 -PASS-  - exception: <class 'ZeroDivisionError'> caught
+2015-01-17 17:30:10,456 - INFO - Check-5: result is 5, pass -PASS- 6 >= 5
+2015-01-17 17:30:13,445 - DEBUG -     vvv  reverse the result (due to -x option set)  vvv
+2015-01-17 17:30:13,446 - INFO - Check-6: my_mul(2,3)*my_add(3) < 5 -PASS- 18 < 5   - Original result: False (-x option set)
+2015-01-17 17:30:13,446 - INFO - Check-7: my_mul(4,5)*5 == 0 -PASS-   - SKIPPED (-s option set)
+2015-01-17 17:30:18,449 - DEBUG -    vvv  Results(-r 5 set) { 1:<7 >= 11>  2:<7 >= 11>  3:<7 >= 11>  4:<7 >= 11>  5:<7 >= 11>  }  vvv
+2015-01-17 17:30:18,450 - ERROR - Check-8: my_add(3,4) >= 11 -FAIL- 7 >= 11 - tried 5 times in 5 seconds
+2015-01-17 17:30:18,450 - ERROR - Check-9: Overall Batch Result: 2 checks failed -FAIL- 1st failed step: (line_10) my_mul(3,4,5) > 20
+'''
+
 
 
 
 if __name__ == '__main__':
     test_check_options()
     test_checks_options()
+    test_checks_batch()
