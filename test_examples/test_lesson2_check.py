@@ -15,7 +15,7 @@ def my_mul(*args):
     return ret
 
 
-def test_basic():
+def test_basic2():
     test_logger.info("To show the basic auto-log functions")
     ## eq(expr1, expr2, passdesc='', faildesc='')
     eq(my_add(3,4,5), my_mul(3,4), "3+4+5 == 3*4")
@@ -62,7 +62,7 @@ def test_check():
     check("my_add(3,4,5) == my_mul(3,4)", passdesc="3+4+5 == 3*4")
     check("my_add(3,4,6) != 12")
     check("my_add(3,4,5) > 10")
-    check("my_mul(3,4) >= 11")
+    check("my_mul(3,4) >= 11 ")
     check("'I ate an apple' !~ r'banana|orange'")
     check("isinstance('string', str)")  # one expr in code_string for check()
     check("3 > 5")
@@ -89,5 +89,5 @@ def test_check():
 ## However, the real power of check/step function is not just like this, see lesson 3 for check options
 
 if __name__ == '__main__':
-    test_basic()
+    test_basic2()
     test_check()

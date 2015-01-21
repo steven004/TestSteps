@@ -8,7 +8,7 @@ like py.test or nose
 """
 
 __author__ = 'Steven LI'
-__version__ = '0.5.0'
+__version__ = '0.5.1'
 
 import logging
 import os, re, time
@@ -17,9 +17,7 @@ import operator
 
 __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'match', 'unmatch',
            'setlogger', 'addBiOperator', 'getOpWrapper', 'step', 'steps', 's', 'check', 'checks',
-           'addStepOption' ]
-
-__tracebackhide__ = True
+           'addStepOption', 'log_new_func', 'auto_func_detection' ]
 
 
 def __init_logger__():
@@ -69,6 +67,16 @@ class __TestLog__(object):
         self.case_name = co.co_name
         self.file_name = co.co_filename
         self.case_no += 1
+        self.__log_case__()
+
+    def new_func(self, name, path):
+        self.step_no = 0
+        self.case_name = name
+        self.file_name = path
+        self.case_no += 1
+        self.__log_case__()
+
+    def __log_case__(self):
         self.step_logger.info("------------------------------------------------------")
         self.step_logger.info("Func %s in file: %s" % (self.case_name, self.file_name))
 
@@ -83,6 +91,19 @@ class __TestLog__(object):
 _this_file = os.path.normcase(setlogger.__code__.co_filename)
 __step_info__ = __TestLog__()
 __init_logger__()
+___auto_func_detection___ = True
+
+def log_new_func(name=None, path=None):
+    if name:
+        __step_info__.new_func(name, path)
+    else:
+        co = _invoker().f_code
+        __step_info__.new_case(co)
+
+
+def auto_func_detection(auto=True):
+    global ___auto_func_detection___
+    ___auto_func_detection___ = auto
 
 
 def _invoker():
@@ -103,23 +124,17 @@ def _step_closure(func):
     :param func: the step function
     :return: True, or raise exception if error
     """
-    __tracebackhide__ = True
 
     def __step__(*args, **kwargs):
         __tracebackhide__ = True
-        # Get current the caller of this function outside this file
-        # f = currentframe().f_back
-        # while hasattr(f, "f_code"):
-        #     co = f.f_code
-        #     filename = os.path.normcase(co.co_filename)
-        #     if filename == _this_file:
-        #         f = f.f_back
-        #         continue
 
-        co = _invoker().f_code
-        if co != __step_info__.case_obj:
-            __step_info__.new_case(co)
-        #break
+        if ___auto_func_detection___:
+            f = _invoker()
+            while '__auto_func_detection__' in f.f_locals and not f.f_locals['__auto_func_detection__']:
+                f = f.f_back
+            co = f.f_code
+            if co != __step_info__.case_obj:
+                __step_info__.new_case(co)
 
         # Get the step message
         (pf, step_info, err_msg) = func(*args, **kwargs)
@@ -257,10 +272,7 @@ def step(code_string, globals=None, locals=None, **kwargs):
 def steps(code_lines, globals=None, locals=None, batch=False):
     __tracebackhide__ = True
     step_list = code_lines.split('\n')
-    # if not globals:
-    #     invoker = currentframe().f_back
-    #     globals = invoker.f_globals
-    #     locals = invoker.f_locals
+
     together = False
     half = ''
     line_no = 0
@@ -309,15 +321,7 @@ class TestStep:
         self.code_string = code_string
         (self.globals, self.locals) = (globals, locals)
         self.kwargs = kwargs
-        # self.options = {
-        #     # format: optionString: [HasThisOption, parameter, func]
-        #     'xfail': [False, False],
-        #     'repeat': [False,  0],
-        #     'timeout': [False, 30],
-        #     'duration': [False, 30],
-        #     'warning': [False, False],
-        #     'skip': [False, False]
-        # }
+
         self.options = dict((k, [False, None]) for k in TestStepOptions.keys())
 
         self.op_string = None
@@ -377,11 +381,6 @@ class TestStep:
         for (k, v) in self.kwargs.items():
             if k in self.options.keys():
                 self.options[k][0] = True
-                # paramType = TestStep.options[k][1]
-                # if paramType == 'int':
-                #     self.options[k][2] = int(v)
-                # elif paramType == 'bool':
-                #     self.options[k][2] = bool(re.compile('T|t|Y|y').match(v))
                 self.options[k][1] = v
             else:  # should not happen
                 raise RuntimeError('ParameterType Error for option: %s' % k)
