@@ -41,6 +41,18 @@ https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson4_ch
 lesson 5 - get return from check and checks function:
 https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson5_return.py
 
+lesson 6 - function auto-detection mechanism:
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson6_func_auto_check.py
+
+
+pytest plugin
+---------------------
+
+For pytest user, you can use the pytest-check_log plugin to use test_steps module.
+The pytest-check_log plugin has better auto-func-detection mechanism.
+
+Get it from: https://pypi.python.org/pypi?:action=display&name=pytest-check_log
+
 
 Example for using simple-step functions
 ---------------------------------------

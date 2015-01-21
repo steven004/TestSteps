@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.5.1
+-------------------------------------------
+* add __auto_func_detection__ local variable to disable the function detection
+* add function to disable auto function detection globally
+* add function for user to start a function logging explicitly.
+
+
 v0.4.0
 -------------------------------------------
 * add lesson 5 example for checks batch argument
