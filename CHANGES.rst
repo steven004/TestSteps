@@ -1,6 +1,16 @@
 Changelog
 =========
 
+v0.6.2
+-------------------------------------------
+* Change the log to Standard output only by default, the user can add more handlers by self
+
+
+v0.6.0
+-------------------------------------------
+* add has(=>) and hasnt(!>) operator, to check if a set has or hasnt an item.
+
+
 v0.5.1
 -------------------------------------------
 * add __auto_func_detection__ local variable to disable the function detection

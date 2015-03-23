@@ -52,7 +52,7 @@ Steven:tmp $ cat test_20150121_2049.log
 # a local variable is introduced to disable auto-function-detection
 # Example: rewrite the compDate functions by setting __auto_func_detection__ = False
 #### For pytest user:
-####    you do not need this, if you are running case under pytest
+####    you can skip this, if you are running cases under pytest
 ####    just install plugin pytest.autochecklog, which will do all of these for you.
 ####    actually, the lesson 6 is not needed for you. everything will just fine.
 

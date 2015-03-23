@@ -1,6 +1,7 @@
 author__ = 'Steven LI'
 
 from test_steps import *
+import logging, time
 
 def my_add(*args):
     ret = 0
@@ -13,6 +14,19 @@ def my_mul(*args):
     for i in args:
         ret *= i
     return ret
+
+def test_logger_setup():
+    ''' Add file-logging into test_logger
+        This is changed from 0.6.1 version.
+        In previous version, this is added by default, but loss of flexibility.
+        So, leave for user from 0.6.1
+    '''
+
+    file_name = time.strftime('/tmp/test'+"_%Y%m%d_%H%M.log")
+    fh = logging.FileHandler(file_name)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    test_logger.addHandler(fh)
 
 
 def test_basic2():
@@ -35,7 +49,7 @@ def test_basic2():
 ## The following logging information will be auto-logged in log file when running the test_basic
 2015-01-15 20:09:13,731 - INFO - To show the basic auto-log functions
 2015-01-15 20:09:13,746 - INFO - ------------------------------------------------------
-2015-01-15 20:09:13,746 - INFO - Func test_basic in file: /TestSteps/test_examples/test_lesson2_check.py
+2015-01-15 20:09:13,746 - INFO - Func test_basic2 in file: /TestSteps/test_examples/test_lesson2_check.py
 2015-01-15 20:09:13,746 - INFO - Check-1: 3+4+5 == 3*4 - PASS - 12 == 12?
 2015-01-15 20:09:13,746 - INFO - Check-2: 13 != 12 - PASS - 13 != 12?
 2015-01-15 20:09:13,746 - INFO - Check-3: 12 > 10 - PASS - 12 > 10?
@@ -73,7 +87,7 @@ def test_check():
 2015-01-15 20:09:13,754 - INFO - To show the check auto-log functions
 2015-01-15 20:09:13,755 - INFO - ------------------------------------------------------
 2015-01-15 20:09:13,755 - INFO - Func test_check in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson2_check.py
-2015-01-15 20:09:13,755 - INFO - Check-1: 3+4+5 == 3*4 - PASS - 12 == 12
+2015-01-15 20:09:13,755 - INFO - Check-1: my_add(3,4,5) == my_mul(3,4) - PASS - 12 == 12
 2015-01-15 20:09:13,757 - INFO - Check-2: my_add(3,4,6) != 12 - PASS - 13 != 12
 2015-01-15 20:09:13,757 - INFO - Check-3: my_add(3,4,5) > 10 - PASS - 12 > 10
 2015-01-15 20:09:13,757 - INFO - Check-4: my_mul(3,4) >= 11 - PASS - 12 >= 11
@@ -89,5 +103,6 @@ def test_check():
 ## However, the real power of check/step function is not just like this, see lesson 3 for check options
 
 if __name__ == '__main__':
+    test_logger_setup()
     test_basic2()
     test_check()

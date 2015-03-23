@@ -8,7 +8,7 @@ like py.test or nose
 """
 
 __author__ = 'Steven LI'
-__version__ = '0.5.1'
+__version__ = '0.6.2'
 
 import logging
 import os, re, time
@@ -16,6 +16,7 @@ from inspect import currentframe
 import operator
 
 __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'match', 'unmatch',
+           'has', 'hasnt',
            'setlogger', 'addBiOperator', 'getOpWrapper', 'step', 'steps', 's', 'check', 'checks',
            'addStepOption', 'log_new_func', 'auto_func_detection' ]
 
@@ -23,22 +24,21 @@ __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'mat
 def __init_logger__():
     global test_logger
 
-    file_name = time.strftime('/tmp/test'+"_%Y%m%d_%H%M.log")
-    fh = logging.FileHandler(file_name)
-    ch = logging.StreamHandler()
+    ##### Remove the following handler to provide more flexibility
+    # file_name = time.strftime('/tmp/test'+"_%Y%m%d_%H%M.log")
+    # fh = logging.FileHandler(file_name)
+    # formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    # fh.setFormatter(formatter)
+    # test_logger.addHandler(fh)
 
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    fh.setFormatter(formatter)
+    ch = logging.StreamHandler()
     formatter = logging.Formatter('%(levelname)s - %(message)s')
     ch.setFormatter(formatter)
-
-    test_logger.addHandler(fh)
     test_logger.addHandler(ch)
 
 
 test_logger = logging.getLogger("Test")
 test_logger.setLevel(logging.DEBUG)
-
 
 def setlogger(testlogger):
     global test_logger
@@ -92,6 +92,7 @@ _this_file = os.path.normcase(setlogger.__code__.co_filename)
 __step_info__ = __TestLog__()
 __init_logger__()
 ___auto_func_detection___ = True
+
 
 def log_new_func(name=None, path=None):
     if name:
@@ -154,11 +155,11 @@ def __ok__(cond, desc, errmsg):
 
 @_step_closure
 def ok(cond, passdesc=None, faildesc=None):
-    '''
+    """
     :param cond: could be a string, when there is no desc parameter and just pass the step
     :param desc: description of this step
     :return: True when it passed
-    '''
+    """
     if not passdesc:
         if isinstance(cond, bool):
             passdesc = "ok(%r)" % cond
@@ -236,12 +237,16 @@ getOpWrapper = lambda op_string: _bi_comp_closure(op_string)
 
 
 ## To add the =~ and !~ operator
-# match = BiOpRegister('=~', lambda o1, o2: re.compile(o2).match(o1))
-# unmatch = BiOpRegister( '!~', lambda o1, o2: not re.compile(o2).match(o1) )
 addBiOperator('=~', lambda o1, o2: re.compile(o2).search(o1))
 match = getOpWrapper('=~')
 addBiOperator('!~', lambda o1, o2: not re.compile(o2).search(o1))
 unmatch = getOpWrapper('!~')
+
+## To add =<(has) and !< (hasnt) operator
+addBiOperator('=>', lambda o1, o2: o2 in o1)
+has = getOpWrapper('=>')
+addBiOperator('!>', lambda o1, o2: not o2 in o1)
+hasnt = getOpWrapper('!>')
 
 
 ####################################################################################
@@ -304,16 +309,18 @@ def steps(code_lines, globals=None, locals=None, batch=False):
                                      'step': step_no,
                                      'code': code_string,
                                      'exception': e})
+                step_res = {'exception': e,
+                            'code': code_string,
+                            'info': e.args,
+                            'result': False}
         step_results.append(step_res)
 
     if len(failed_steps):
         __ok__(False, 'Overall Batch Result: %d checks failed' % len(failed_steps),
-               '1st failed step: (line_%d) %s' % (line_no, failed_steps[0]['code']))
+               '1st failed step: (line_%d) %s\nerr_msg: %s' % (line_no, failed_steps[0]['code']) )
     return {'result': True,
             'step_results': step_results}
 
-
-s = steps
 
 
 class TestStep:
@@ -598,3 +605,4 @@ addStepOption('faildesc', 'f', str, _fail_desc, 'xfail')
 
 check = step
 checks = steps
+s = steps
