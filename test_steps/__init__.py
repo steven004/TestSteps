@@ -19,7 +19,7 @@ __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'mat
            'has', 'hasnt',
            'setlogger', 'addBiOperator', 'getOpWrapper', 'step', 'steps', 's', 'check', 'checks',
            'addStepOption', 'log_new_func', 'auto_func_detection',
-           'ReturnPassList']
+           'ReturnPassSet']
 
 
 def __init_logger__():
@@ -149,8 +149,11 @@ def _step_closure(func):
 
 
 ##
-ReturnPassList = [0, None]
-PassedOrNot = lambda cond: True if cond in ReturnPassList or cond else False
+ReturnPassSet = {0, None}
+def PassedOrNot(cond):
+    for v in ReturnPassSet:
+        if cond is v: return True
+    return bool(cond)
 
 @_step_closure
 def __ok__(cond, desc, errmsg):
@@ -410,8 +413,9 @@ class TestStep:
             self.err_msg = "%r" % (self.expr1_val)
 
         #self.result = bool(ret)
+        #return ret
         self.result = PassedOrNot(ret)
-        return ret
+        return self.result
 
     def execute(self):
         __tracebackhide__ = True
