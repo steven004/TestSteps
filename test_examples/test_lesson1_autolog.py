@@ -1,6 +1,7 @@
 __author__ = 'Steven LI'
 
 from test_steps import *
+import logging, time
 
 def my_add(*args):
     ret = 0
@@ -13,6 +14,20 @@ def my_mul(*args):
     for i in args:
         ret *= i
     return ret
+
+
+def test_logger_setup():
+    ''' Add file-logging into test_logger
+        This is changed from 0.6.1 version.
+        In previous version, this is added by default, but loss of flexibility.
+        So, leave for user from 0.6.1
+    '''
+
+    file_name = time.strftime('/tmp/test'+"_%Y%m%d_%H%M.log")
+    fh = logging.FileHandler(file_name)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    test_logger.addHandler(fh)
 
 
 def test_basic():
@@ -31,7 +46,7 @@ def test_basic():
     fail("Just fail and log. nothing more")
 
 ## The following logging information will be auto-logged in log file when running the test_basic
-## The default log file is '/tmp/test_yyyymmdd_hhmm.log'
+## The log file is '/tmp/test_yyyymmdd_hhmm.log'
 ##
 '''
 2015-01-15 20:09:13,731 - INFO - To show the basic auto-log functions
@@ -55,4 +70,5 @@ def test_basic():
 
 
 if __name__ == '__main__':
+    test_logger_setup()
     test_basic()

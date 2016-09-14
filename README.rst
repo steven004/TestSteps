@@ -41,17 +41,21 @@ https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson4_ch
 lesson 5 - get return from check and checks function:
 https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson5_return.py
 
-lesson 6 - function auto-detection mechanism:
+lesson 6 - function auto-detection mechanism (pytest/nose users can skip this, use plugin instead):
 https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson6_func_auto_check.py
 
 
-pytest plugin
----------------------
+pytest-autochecklog/nose-autochecklog plugin
+--------------------------------------------
 
-For pytest user, you can use the pytest-check_log plugin to use test_steps module.
-The pytest-check_log plugin has better auto-func-detection mechanism.
+For pytest or nosetests user, you can use the pytest-autochecklog or nose-autochecklog plugin
+to use test_steps module. The pytest-autochecklog or nose-autochecklog plugin
+has better auto-func-detection mechanism.
 
-Get it from: https://pypi.python.org/pypi?:action=display&name=pytest-check_log
+Get it from: https://pypi.python.org/pypi?:action=display&name=pytest-autochecklog
+
+or: https://pypi.python.org/pypi?:action=display&name=nose-autochecklog
+
 
 
 Example for using simple-step functions
@@ -145,7 +149,7 @@ Not as the other check functions (eq, ne, ...), the check/checks functions just 
 write the checks in a string. The mapping of operators and check functions::
 
     == : eq         != : ne         > : gt      < : lt      >= : ge     <= : le
-    =~ : match      !~ : unmatch
+    =~ : match      !~ : unmatch    =>: has     !> hasnt
 
 
 *checks* is another way to write checks in one statement. When the function checks (or s) is used,
@@ -224,27 +228,39 @@ Currently, just binary operators are supported.
 logging setting
 ---------------
 
-The default logger is Python logging module. You can directly use it to write logs, such as:
+The default logger test_logger is a Python logging instance, from the code like:
+
+.. code-block:: python
+
+    test_logger = logging.getLogger("Test").
+
+You can directly use it to write logs, such as:
 
 .. code-block:: python
 
     test_logger.info("This will be write in to the /tmp/test_log/mm-dd-yyyy.log file")
     test_logger.debug("debug information")
 
+Or, you can directly config or format the test_logger, just as you do for a normal logging handler.
+(See standard logging module to get more information), the following code is to add file handler
+with a time format in the file name
 
-You can set your own logger for your test as below:
+.. code-block:: python
+
+    import logging, time
+    file_name = time.strftime('/tmp/test'+"_%Y%m%d_%H%M.log")
+    fh = logging.FileHandler(file_name)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    test_logger.addHandler(fh)
+
+
+You can change the default test_logger or combine with another one using the setlogger method:
 
 .. code-block:: python
 
     setlogger(your_logger)
     # your_logger could be a logging object, or any object which support methods like info, error, ...
 
-Or, you can directly config or format the test_logger, just as you do for a normal logging object.
 
-Of course, you can set your log format, and the log files. By default, the log is print to the
-standard output.
-
-
-
-
-
+By default, the log is to the standard output.
