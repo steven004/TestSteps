@@ -86,7 +86,7 @@ def test_check():
 '''
 2015-01-15 20:09:13,754 - INFO - To show the check auto-log functions
 2015-01-15 20:09:13,755 - INFO - ------------------------------------------------------
-2015-01-15 20:09:13,755 - INFO - Func test_check in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson2_check.py
+2015-01-15 20:09:13,755 - INFO - Func test_check in file: /test_examples/test_lesson2_check.py
 2015-01-15 20:09:13,755 - INFO - Check-1: my_add(3,4,5) == my_mul(3,4) - PASS - 12 == 12
 2015-01-15 20:09:13,757 - INFO - Check-2: my_add(3,4,6) != 12 - PASS - 13 != 12
 2015-01-15 20:09:13,757 - INFO - Check-3: my_add(3,4,5) > 10 - PASS - 12 > 10

@@ -1,0 +1,23 @@
+##### Example - index.yaml file
+
+
+obj_init17:
+  mm: 5
+  nn: 10
+  oo: 2
+  pp: "Good"
+  qq: 'afternoon'
+
+obj_init15:
+  mm: 5
+  nn: 10
+  oo: 0
+
+obj_init_uncomplete:
+  mm: 10
+
+obj_01215:
+  xx: true
+  yy: 0
+  mm: 12
+  nn: 15

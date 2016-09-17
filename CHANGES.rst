@@ -1,6 +1,17 @@
 Changelog
 =========
 
+v0.8.1
+-------------------------------------------
+* Implement enhancement of the issue#21. Implement a function init_testbed to
+initialize objects in a test bed, which is described in a .py or .yaml file.
+and added a new example to use init_testbed function
+
+v0.7.1
+-------------------------------------------
+* Fix the issue#20, let the step pass when return is 0 or Zone by default. This can be reset by
+changing the RunPassSet.
+
 v0.6.2
 -------------------------------------------
 * Change the log to Standard output only by default, the user can add more handlers by self

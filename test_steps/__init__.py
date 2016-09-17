@@ -8,19 +8,19 @@ like py.test or nose
 """
 
 __author__ = 'Steven LI'
-__version__ = '0.7.1'
+__version__ = '0.8.1'
 
 import logging
 import os, re, time
 from inspect import currentframe
 import operator
+from .ymal_testbed import init_testbed
 
 __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'match', 'unmatch',
            'has', 'hasnt',
            'setlogger', 'addBiOperator', 'getOpWrapper', 'step', 'steps', 's', 'check', 'checks',
            'addStepOption', 'log_new_func', 'auto_func_detection',
-           'ReturnPassSet']
-
+           'ReturnPassSet', 'init_testbed']
 
 def __init_logger__():
     global test_logger
@@ -214,7 +214,7 @@ class TestStepFail(Exception):
     """ custom exception for error reporting. """
 
 
-class TestRunTimeError(Exception):
+class TestRunTimeError(RuntimeError):
     """ custom exception for error reporting. """
 
 
