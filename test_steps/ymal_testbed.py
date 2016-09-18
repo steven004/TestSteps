@@ -56,7 +56,8 @@ class MissArguments(ValueError):
     """Missed the arguments in the test bed file"""
 
 def init_yaml_testbed(filename):
-    with open(filename, encoding='utf-8') as f:
+    #with open(filename, encoding='utf-8') as f:
+    with open(filename) as f:
         object_dict = yaml.load(f)
 
     index_dict = dict()
@@ -71,7 +72,8 @@ def init_yaml_testbed(filename):
 
         # load index dictionary
         for index_file in index_files:
-            with open(index_file, encoding='utf-8') as f:
+            #with open(index_file, encoding='utf-8') as f:
+            with open(index_file) as f:
                 index_dict.update(yaml.load(f))
 
     tbm = types.ModuleType('test_bed', "Dynamically created test bed module")
@@ -85,7 +87,7 @@ def init_yaml_testbed(filename):
         class_file = class_path[:-len(class_name)-1]
         m = importlib.import_module(class_file)
         class_def = getattr(m, class_name)
-        arg_spec = inspect.getargspec(class_def)
+        arg_spec = inspect.getargspec(class_def.__init__)
         args = arg_spec.args[1:]    # remove 'self'
         defaults = arg_spec.defaults
         if defaults == None: defaults = []
@@ -123,3 +125,4 @@ def init_testbed(filename, namespace=None):
         return init_yaml_testbed(filename)
     else:
         raise FileTypeError("{0} is not a valid test bed file type, only .py and .yaml supported".format(filename))
+

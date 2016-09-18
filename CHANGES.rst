@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v0.8.2
+-------------------------------------------
+* Fix the python2 compatible issue.
+
 v0.8.1
 -------------------------------------------
 * Implement enhancement of the issue#21. Implement a function init_testbed to

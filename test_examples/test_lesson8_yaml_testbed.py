@@ -1,5 +1,5 @@
 #from testbed.yaml_testbed import init_testbed
-from test_steps import ok, eq, ne, init_testbed
+from test_steps import ok, eq, ne, init_testbed, check
 
 tb_m = init_testbed("lesson8_testbed_obj.yaml")
 
@@ -29,8 +29,9 @@ def test_with_index_file():
     eq(tb_m.obj5.get_value(), 22)
     eq(tb_m.obj6.get_value(), 17)
     eq(tb_m.obj6.get_msg(), 'Goodafternoon')
-    eq(tb_m.obj6.multiple(10), 170)
-
+    #eq(tb_m.obj6.multiple(10), 170)
+    check("tb_m.obj6.multiple(10) == 170")
+    check("tb_m.obj6.multiple(10) == 20", warning=True, repeat=2)
 
 if __name__ == '__main__':
     test_no_param()
