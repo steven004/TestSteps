@@ -2,7 +2,7 @@
 from test_steps import ok, eq, ne, init_testbed, check
 
 
-tb_m = init_testbed("/Users/xili4/PycharmProjects/TestSteps/test_examples/lesson8_testbed_obj.yaml")
+tb_m = init_testbed()
 
 def test_no_param():
     ok(tb_m)

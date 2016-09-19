@@ -45,7 +45,7 @@ In this module, a method is provided to initiate the test bed based on the objec
 """
 
 import yaml
-import os, types
+import os, types, re
 import inspect
 import importlib
 
@@ -54,6 +54,17 @@ class FileTypeError(TypeError):
 
 class MissArguments(ValueError):
     """Missed the arguments in the test bed file"""
+
+def _invoker_file():
+    f = inspect.currentframe()
+    while hasattr(f, "f_code"):
+        co = f.f_code
+        filename = os.path.normcase(co.co_filename)
+
+        if filename != os.path.normcase(__file__):
+            return filename
+        f = f.f_back
+    else: raise RuntimeError("no code for the frame, why?")
 
 def init_yaml_testbed(filename):
     #with open(filename, encoding='utf-8') as f:
@@ -116,7 +127,15 @@ def init_yaml_testbed(filename):
 
     return tbm
 
-def init_testbed(filename, namespace=None):
+def absoluteFilePath(filename):
+    if filename == '':
+        script_file = _invoker_file()
+        return re.compile('.py$').sub(".yaml", script_file)
+    else:
+        return filename
+
+def init_testbed(filename='', namespace=None):
+    filename = absoluteFilePath(filename)
     basename, ext = os.path.splitext(filename)
     if ext == '' or ext == '.py':
         import importlib

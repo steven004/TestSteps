@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v0.8.3
+-------------------------------------------
+* Fix #25: default test bed file support. Now you can invoke init_testbed() without parameters.
+In this case, it will automatically load the .yaml file with the same base name of the script file.
+
 v0.8.2
 -------------------------------------------
 * Fix the python2 compatible issue.
