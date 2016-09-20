@@ -2,7 +2,7 @@
 from test_steps import ok, eq, ne, init_testbed, check
 
 
-tb_m = init_testbed()
+tb_m = init_testbed('test_lesson8_yaml_testbed2.yaml')
 
 def test_no_param():
     ok(tb_m)

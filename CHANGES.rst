@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v0.8.5
+v0.8.6
 -------------------------------------------
 * Fix #24: relative path handling in yaml_testbed function. Now it will check the path relative to the cwd(),
 if not exists, it will try to get the file relative to the parent file location.

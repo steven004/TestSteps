@@ -70,14 +70,17 @@ def _invoker_file():
 def absoluteFilePath(filename, relativebasefile=None):
     if os.path.isabs(filename):
         return filename
+
+    if not relativebasefile:
+        relativebasefile = _invoker_file()
+
     if filename == '':
-        script_file = _invoker_file()
-        return re.compile('.py$').sub(".yaml", script_file)
+        return re.compile('.py$').sub(".yaml", relativebasefile)
 
     ### relative path handling
     if os.path.exists(filename):
         return os.path.realpath(filename)
-    if relativebasefile:
+    else:
         absolutepath = os.path.join(os.path.dirname(relativebasefile), filename)
         if os.path.exists(absolutepath):
             return absolutepath
