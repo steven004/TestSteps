@@ -1,4 +1,4 @@
-testbed_conf: /Users/xili4/PycharmProjects/TestSteps/test_examples/lesson8_testbed_index.yaml
+testbed_conf: lesson8_testbed_index.yaml
 
 obj1:
   class: test_examples.lesson8_Sample_module.something

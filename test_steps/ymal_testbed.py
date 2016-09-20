@@ -61,10 +61,28 @@ def _invoker_file():
         co = f.f_code
         filename = os.path.normcase(co.co_filename)
 
-        if filename != os.path.normcase(__file__):
+        if filename != os.path.normcase(init_testbed.__code__.co_filename):
             return filename
         f = f.f_back
     else: raise RuntimeError("no code for the frame, why?")
+
+
+def absoluteFilePath(filename, relativebasefile=None):
+    if os.path.isabs(filename):
+        return filename
+    if filename == '':
+        script_file = _invoker_file()
+        return re.compile('.py$').sub(".yaml", script_file)
+
+    ### relative path handling
+    if os.path.exists(filename):
+        return os.path.realpath(filename)
+    if relativebasefile:
+        absolutepath = os.path.join(os.path.dirname(relativebasefile), filename)
+        if os.path.exists(absolutepath):
+            return absolutepath
+
+    raise NameError('{0} does not exist, please double check', filename)
 
 def init_yaml_testbed(filename):
     #with open(filename, encoding='utf-8') as f:
@@ -84,7 +102,8 @@ def init_yaml_testbed(filename):
         # load index dictionary
         for index_file in index_files:
             #with open(index_file, encoding='utf-8') as f:
-            with open(index_file) as f:
+            index_file_path = absoluteFilePath(index_file, filename)
+            with open(index_file_path) as f:
                 index_dict.update(yaml.load(f))
 
     tbm = types.ModuleType('test_bed', "Dynamically created test bed module")
@@ -127,12 +146,6 @@ def init_yaml_testbed(filename):
 
     return tbm
 
-def absoluteFilePath(filename):
-    if filename == '':
-        script_file = _invoker_file()
-        return re.compile('.py$').sub(".yaml", script_file)
-    else:
-        return filename
 
 def init_testbed(filename='', namespace=None):
     filename = absoluteFilePath(filename)
