@@ -1,0 +1,36 @@
+testbed_conf: /Users/xili4/PycharmProjects/TestSteps/test_examples/lesson8_testbed_index.yaml
+
+obj1:
+  class: test_examples.lesson8_Sample_module.something
+
+obj2:
+  class: test_examples.lesson8_Sample_module.something2
+  mm: 5
+  nn: 10
+  oo: 2
+
+obj3:
+  class: test_examples.lesson8_Sample_module.something2
+  mm: 5
+  nn: 10
+  oo: 2
+  pp: "Good"
+  qq: 'afternoon'
+
+obj4:
+  class: test_examples.lesson8_Sample_module.something2
+  mm: 5
+  nn: 10
+  oo: 2
+  pp: "Good"
+
+
+obj5:
+  class: test_examples.lesson8_Sample_module.something2
+  name: obj_init17
+  mm: 10
+
+
+obj6:
+  class: test_examples.lesson8_Sample_module.something2
+  name: obj_init17

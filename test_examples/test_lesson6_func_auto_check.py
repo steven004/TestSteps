@@ -33,17 +33,17 @@ def test_date():
 '''
 Steven:tmp $ cat test_20150121_2049.log 
 2015-01-21 20:49:07,917 - INFO - ------------------------------------------------------
-2015-01-21 20:49:07,917 - INFO - Func test_date in file: /TestSteps/test_examples/test_lesson6_func_auto_check.py
+2015-01-21 20:49:07,917 - INFO - Func test_date in file: /test_examples/test_lesson6_func_auto_check.py
 2015-01-21 20:49:07,917 - INFO - Check-1: 8 == 8 -PASS- 8 == 8?
 2015-01-21 20:49:07,918 - INFO - ------------------------------------------------------
-2015-01-21 20:49:07,918 - INFO - Func compDate in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson6_func_auto_check.py
+2015-01-21 20:49:07,918 - INFO - Func compDate in file: /test_examples/test_lesson6_func_auto_check.py
 2015-01-21 20:49:07,918 - INFO - Check-1: 11/4/2015 =d= 11-04-2015 -PASS- 
 2015-01-21 20:49:07,918 - INFO - ------------------------------------------------------
-2015-01-21 20:49:07,918 - INFO - Func test_date in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson6_func_auto_check.py
+2015-01-21 20:49:07,918 - INFO - Func test_date in file: /test_examples/test_lesson6_func_auto_check.py
 2015-01-21 20:49:07,918 - INFO - Check-1: ok step -PASS- 
 2015-01-21 20:49:07,918 - INFO - Check-2: 3 should pass -PASS- 
 2015-01-21 20:49:07,918 - INFO - ------------------------------------------------------
-2015-01-21 20:49:07,919 - INFO - Func compDate in file: /Users/xili4/PycharmProjects/TestSteps/test_examples/test_lesson6_func_auto_check.py
+2015-01-21 20:49:07,919 - INFO - Func compDate in file: /test_examples/test_lesson6_func_auto_check.py
 2015-01-21 20:49:07,919 - ERROR - Check-1: 12/4/2014 =!d= 12-04/2015 -FAIL- 
 '''
 

@@ -1,6 +1,31 @@
 Changelog
 =========
 
+v0.8.6
+-------------------------------------------
+* Fix #24: relative path handling in yaml_testbed function. Now it will check the path relative to the cwd(),
+if not exists, it will try to get the file relative to the parent file location.
+
+v0.8.3
+-------------------------------------------
+* Fix #25: default test bed file support. Now you can invoke init_testbed() without parameters.
+In this case, it will automatically load the .yaml file with the same base name of the script file.
+
+v0.8.2
+-------------------------------------------
+* Fix the python2 compatible issue.
+
+v0.8.1
+-------------------------------------------
+* Implement enhancement of the issue#21. Implement a function init_testbed to
+initialize objects in a test bed, which is described in a .py or .yaml file.
+and added a new example to use init_testbed function
+
+v0.7.1
+-------------------------------------------
+* Fix the issue#20, let the step pass when return is 0 or Zone by default. This can be reset by
+changing the RunPassSet.
+
 v0.6.2
 -------------------------------------------
 * Change the log to Standard output only by default, the user can add more handlers by self

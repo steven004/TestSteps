@@ -8,18 +8,19 @@ like py.test or nose
 """
 
 __author__ = 'Steven LI'
-__version__ = '0.6.2'
+__version__ = '0.8.6'
 
 import logging
 import os, re, time
 from inspect import currentframe
 import operator
+from .ymal_testbed import init_testbed
 
 __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'match', 'unmatch',
            'has', 'hasnt',
            'setlogger', 'addBiOperator', 'getOpWrapper', 'step', 'steps', 's', 'check', 'checks',
-           'addStepOption', 'log_new_func', 'auto_func_detection' ]
-
+           'addStepOption', 'log_new_func', 'auto_func_detection',
+           'ReturnPassSet', 'init_testbed']
 
 def __init_logger__():
     global test_logger
@@ -120,8 +121,8 @@ def _invoker():
 
 
 def _step_closure(func):
-    """
-    decorator of closure: execution and logging for step functions
+    """decorator of closure: execution and logging for step functions
+
     :param func: the step function
     :return: True, or raise exception if error
     """
@@ -147,6 +148,13 @@ def _step_closure(func):
     return (__step__)
 
 
+##
+ReturnPassSet = {0, None}
+def PassedOrNot(cond):
+    for v in ReturnPassSet:
+        if cond is v: return True
+    return bool(cond)
+
 @_step_closure
 def __ok__(cond, desc, errmsg):
     __tracebackhide__ = True
@@ -155,9 +163,10 @@ def __ok__(cond, desc, errmsg):
 
 @_step_closure
 def ok(cond, passdesc=None, faildesc=None):
-    """
+    """ One test step to be logged, pass if cond
     :param cond: could be a string, when there is no desc parameter and just pass the step
-    :param desc: description of this step
+    :param passdesc: description of this step to be logged if passed
+    :param faildesc: description of this step to be logged if failed
     :return: True when it passed
     """
     if not passdesc:
@@ -168,7 +177,7 @@ def ok(cond, passdesc=None, faildesc=None):
             cond = True
     if not faildesc: faildesc = passdesc
 
-    if cond:
+    if PassedOrNot(cond):
         return (True, passdesc, '')
     else:
         return (False, faildesc, '')
@@ -205,7 +214,7 @@ class TestStepFail(Exception):
     """ custom exception for error reporting. """
 
 
-class TestRunTimeError(Exception):
+class TestRunTimeError(RuntimeError):
     """ custom exception for error reporting. """
 
 
@@ -403,8 +412,10 @@ class TestStep:
         else:
             self.err_msg = "%r" % (self.expr1_val)
 
-        self.result = bool(ret)
-        return ret
+        #self.result = bool(ret)
+        #return ret
+        self.result = PassedOrNot(ret)
+        return self.result
 
     def execute(self):
         __tracebackhide__ = True
