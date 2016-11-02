@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v0.8.8
+-------------------------------------------
+* Fix #27: Environment variable TESTBED_CONFIG_PATH support. Now the scripts could use the same test bed configuration
+file, but the tester can place the file into different folders for different purpose. When running the test, the config
+file under the path indicated by TESTBED_CONFIG_PATH will be used.
+
 v0.8.6
 -------------------------------------------
 * Fix #24: relative path handling in yaml_testbed function. Now it will check the path relative to the cwd(),

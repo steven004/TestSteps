@@ -72,23 +72,28 @@ def _invoker_file():
 
 def absoluteFilePath(filename, relative_base_file=None):
     if os.path.isabs(filename):
-        return filename
+        if os.path.exists(filename):
+            return filename
+        else:
+            raise NameError('{0} does not exist, please double check', filename)
 
-    if not relative_base_file:
-        relative_base_file = _invoker_file()
 
-    if not filename:
-        return re.compile('.py$').sub(".yaml", relative_base_file)
-
-    # relative path handling
-    if os.path.exists(filename):
-        return os.path.realpath(filename)
+    if relative_base_file:
+        relative_base_path = os.path.dirname(relative_base_file)
     else:
-        absolutepath = os.path.join(os.path.dirname(relative_base_file), filename)
-        if os.path.exists(absolutepath):
-            return absolutepath
+        relative_base_path = os.environ.get('TESTBED_CONFIG_PATH')
 
-    raise NameError('{0} does not exist, please double check', filename)
+    if not relative_base_path:
+        relative_base_path = os.path.dirname(_invoker_file())
+    if not filename:
+        filename = re.compile('.py$').sub('.yaml', os.path.basename(_invoker_file()))
+
+    filepath = os.path.join(os.path.realpath(relative_base_path), filename)
+
+    if os.path.exists(filepath):
+        return filepath
+
+    raise NameError('{0} does not exist, please double check', filepath)
 
 
 def init_yaml_testbed(filename):
