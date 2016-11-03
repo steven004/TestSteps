@@ -49,8 +49,10 @@ import os, types, re
 import inspect
 import importlib
 
+
 class FileTypeError(TypeError):
     """TestBed file type error exception."""
+
 
 class MissArguments(ValueError):
     """Missed the arguments in the test bed file"""
@@ -64,28 +66,36 @@ def _invoker_file():
         if filename != os.path.normcase(init_testbed.__code__.co_filename):
             return filename
         f = f.f_back
-    else: raise RuntimeError("no code for the frame, why?")
-
-
-def absoluteFilePath(filename, relativebasefile=None):
-    if os.path.isabs(filename):
-        return filename
-
-    if not relativebasefile:
-        relativebasefile = _invoker_file()
-
-    if filename == '':
-        return re.compile('.py$').sub(".yaml", relativebasefile)
-
-    ### relative path handling
-    if os.path.exists(filename):
-        return os.path.realpath(filename)
     else:
-        absolutepath = os.path.join(os.path.dirname(relativebasefile), filename)
-        if os.path.exists(absolutepath):
-            return absolutepath
+        raise RuntimeError("no code for the frame, why?")
 
-    raise NameError('{0} does not exist, please double check', filename)
+
+def absoluteFilePath(filename, relative_base_file=None):
+    if os.path.isabs(filename):
+        if os.path.exists(filename):
+            return filename
+        else:
+            raise NameError('{0} does not exist, please double check', filename)
+
+
+    if relative_base_file:
+        relative_base_path = os.path.dirname(relative_base_file)
+    else:
+        #relative_base_path = os.environ.get('TESTBED_CONFIG_PATH')
+        relative_base_path = os.environ.get('TESTSUITE_CONFIG_PATH')
+
+    if not relative_base_path:
+        relative_base_path = os.path.dirname(_invoker_file())
+    if not filename:
+        filename = re.compile('.py$').sub('.yaml', os.path.basename(_invoker_file()))
+
+    filepath = os.path.join(os.path.realpath(relative_base_path), filename)
+
+    if os.path.exists(filepath):
+        return filepath
+
+    raise NameError('{0} does not exist, please double check', filepath)
+
 
 def init_yaml_testbed(filename):
     #with open(filename, encoding='utf-8') as f:
@@ -93,7 +103,7 @@ def init_yaml_testbed(filename):
         object_dict = yaml.load(f)
 
     index_dict = dict()
-    ### See if the testbed_conf is defined in this object file
+    # See if the testbed_conf is defined in this object file
     if 'testbed_conf' in object_dict:
         index_files = object_dict['testbed_conf']
         del object_dict['testbed_conf']
@@ -127,7 +137,7 @@ def init_yaml_testbed(filename):
 
         original_name = attr_dict.get('name')
         if original_name:
-            #attr_dict.update(index_dict[original_name])
+            # attr_dict.update(index_dict[original_name])
             attr_dict = dict(list(index_dict[original_name].items()) + list(attr_dict.items()))
             del attr_dict['name']
 

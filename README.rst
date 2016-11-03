@@ -1,11 +1,5 @@
 Test Steps functions for each assertion and automatic logging
-===============================================================
-
-.. image:: https://pypip.in/v/test_steps/badge.png
-    :target: https://crate.io/packages/test_steps/
-
-.. image:: https://pypip.in/d/test_steps/badge.png
-    :target: https://crate.io/packages/test_steps/
+=============================================================
 
 The package test_steps is to implement a bunch of functions about test checks and logging.
 The purpose is to simplify the assertion and automatically logging the checks,
@@ -13,6 +7,15 @@ which are not supported in most of the current python test frames.
 
 All the checks and logging functions can be used independently, or be used in test frameworks
 as py.test or nose
+
+
+Magics in source code
+---------------------
+
+To make is extensible and more flexible, meta-programming and functional programming technologies
+are used in this package. It makes the source is thus likely not something for Python beginners.
+However, you are welcome if you want to study meta-programming or functional programming, and
+your comments are always appreciated
 
 
 Install test_steps
