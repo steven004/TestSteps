@@ -81,7 +81,8 @@ def absoluteFilePath(filename, relative_base_file=None):
     if relative_base_file:
         relative_base_path = os.path.dirname(relative_base_file)
     else:
-        relative_base_path = os.environ.get('TESTBED_CONFIG_PATH')
+        #relative_base_path = os.environ.get('TESTBED_CONFIG_PATH')
+        relative_base_path = os.environ.get('TESTSUITE_CONFIG_PATH')
 
     if not relative_base_path:
         relative_base_path = os.path.dirname(_invoker_file())

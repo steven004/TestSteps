@@ -1,11 +1,18 @@
 Changelog
 =========
 
+v0.8.9
+-------------------------------------------
+* Fix issue #28: Change the environment variable TESTBED_CONFIG_PATH to TESTSUITE_CONFIG_PATH
+to avoid concept confusion.
+
+
 v0.8.8
 -------------------------------------------
 * Fix #27: Environment variable TESTBED_CONFIG_PATH support. Now the scripts could use the same test bed configuration
 file, but the tester can place the file into different folders for different purpose. When running the test, the config
 file under the path indicated by TESTBED_CONFIG_PATH will be used.
+
 
 v0.8.6
 -------------------------------------------
@@ -17,9 +24,11 @@ v0.8.3
 * Fix #25: default test bed file support. Now you can invoke init_testbed() without parameters.
 In this case, it will automatically load the .yaml file with the same base name of the script file.
 
+
 v0.8.2
 -------------------------------------------
 * Fix the python2 compatible issue.
+
 
 v0.8.1
 -------------------------------------------
@@ -27,10 +36,12 @@ v0.8.1
 initialize objects in a test bed, which is described in a .py or .yaml file.
 and added a new example to use init_testbed function
 
+
 v0.7.1
 -------------------------------------------
 * Fix the issue#20, let the step pass when return is 0 or Zone by default. This can be reset by
 changing the RunPassSet.
+
 
 v0.6.2
 -------------------------------------------
