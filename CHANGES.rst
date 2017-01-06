@@ -1,6 +1,12 @@
 Changelog
 =========
 
+
+v0.9.0
+-------------------------------------------
+* Fix issue #30: Fix the .py type testbed config file import problem.
+
+
 v0.8.9
 -------------------------------------------
 * Fix issue #28: Change the environment variable TESTBED_CONFIG_PATH to TESTSUITE_CONFIG_PATH

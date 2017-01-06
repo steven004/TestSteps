@@ -19,6 +19,7 @@ setup(
         "Topic :: Software Development :: Libraries",
         "Topic :: Utilities",
         "Topic :: System :: Logging",
+        "Programming Language :: Python :: 2"
         "Programming Language :: Python :: 3"
     ],
     version=test_steps.__version__,

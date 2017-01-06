@@ -49,7 +49,6 @@ import os, types, re
 import inspect
 import importlib
 
-
 class FileTypeError(TypeError):
     """TestBed file type error exception."""
 
@@ -97,7 +96,7 @@ def absoluteFilePath(filename, relative_base_file=None):
     raise NameError('{0} does not exist, please double check', filepath)
 
 
-def init_yaml_testbed(filename):
+def init_yaml_testbed(filename, tbm):
     #with open(filename, encoding='utf-8') as f:
     with open(filename) as f:
         object_dict = yaml.load(f)
@@ -118,8 +117,6 @@ def init_yaml_testbed(filename):
             index_file_path = absoluteFilePath(index_file, filename)
             with open(index_file_path) as f:
                 index_dict.update(yaml.load(f))
-
-    tbm = types.ModuleType('test_bed', "Dynamically created test bed module")
 
     for tb_object in object_dict.keys():
         attr_dict = object_dict[tb_object]
@@ -163,11 +160,13 @@ def init_yaml_testbed(filename):
 def init_testbed(filename='', namespace=None):
     filename = absoluteFilePath(filename)
     basename, ext = os.path.splitext(filename)
-    if ext == '' or ext == '.py':
-        import importlib
-        return importlib.import_module(basename)
+    tbm = types.ModuleType('test_bed', "Dynamically created test bed module")
+
+    if ext == '.py':
+        exec(compile(open(filename, 'rb').read(), filename, 'exec'), tbm.__dict__)
+        return tbm
     elif ext == '.yaml':
-        return init_yaml_testbed(filename)
+        return init_yaml_testbed(filename, tbm)
     else:
         raise FileTypeError("{0} is not a valid test bed file type, only .py and .yaml supported".format(filename))
 
