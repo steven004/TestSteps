@@ -47,6 +47,16 @@ https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson5_re
 lesson 6 - function auto-detection mechanism (pytest/nose users can skip this, use plugin instead):
 https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson6_func_auto_check.py
 
+lesson 7 - return value setting as case pass (0 or None is considerred as pass by default:
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson7_returnvalue.py
+
+lesson 8 - yaml test bed initialization support:
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson8_yaml_testbed.py
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson8_yaml_testbed2.py
+
+lesson 9 - python format test bed initialization support:
+https://github.com/steven004/TestSteps/blob/master/test_examples/test_lesson9_pytestbed.py
+
 
 pytest-autochecklog/nose-autochecklog plugin
 --------------------------------------------
@@ -226,6 +236,33 @@ everything will be auto logged.
 
 Currently, just binary operators are supported.
 
+
+Test Bed initialization
+-----------------------
+
+This feature is to improve test scripts portabiity. When we write scripts, we'd like to separate
+test bed description and code into separated files. One test suite could run on different test beds.
+This feature support an environment variable TESTSUITE_CONFIG_PATH, which indicate where the test bed
+description file is located. Two kinds of format of test beds are supported: .py or .yaml
+
+Examples:
+
+.. code-block:: python
+
+    # Initiate a test bed which is indicated as a absolute path
+    # Initiated test bed will be return as a module
+    tb_m = init_testbed("/Users/xili4/PycharmProjects/TestSteps/test_examples/lesson8_testbed_obj.yaml")
+
+    # Initiated a test bed which is in the path TESTSUITE_CONFIG_PATH indicated
+    # or get it from the scripts path if no TESTSUITE_CONFIG_PATH defined
+    tb_m = init_testbed('test_lesson8_yaml_testbed2.yaml')
+
+    # Initiated a test bed which has the same base name of the scripts file, but using yaml as extended name
+    tb_m = init_testbed()
+
+    # Initiate a .py test bed described in the path TESTSUITE_CONFIG_PATH indicated
+    # or in the scripts located path
+    tb_m = init_testbed('lesson9_pytestbed_config.py')
 
 
 logging setting
