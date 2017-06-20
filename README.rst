@@ -237,12 +237,12 @@ everything will be auto logged.
 Currently, just binary operators are supported.
 
 
-Test Bed initialization
------------------------
+Test Bed initialization (Environment Variable: TESTSUITE_CONFIG_PATH)
+---------------------------------------------------------------------
 
 This feature is to improve test scripts portabiity. When we write scripts, we'd like to separate
 test bed description and code into separated files. One test suite could run on different test beds.
-This feature support an environment variable TESTSUITE_CONFIG_PATH, which indicate where the test bed
+This feature support an environment variable *TESTSUITE_CONFIG_PATH*, which indicate where the test bed
 description file is located. Two kinds of format of test beds are supported: .py or .yaml
 
 Examples:
@@ -265,8 +265,8 @@ Examples:
     tb_m = init_testbed('lesson9_pytestbed_config.py')
 
 
-logging setting
----------------
+logging setting (Environment Variable: TESTSTEP_LOG_DIR)
+--------------------------------------------------------
 
 The default logger test_logger is a Python logging instance, from the code like:
 
@@ -281,18 +281,17 @@ You can directly use it to write logs, such as:
     test_logger.info("This will be write in to the /tmp/test_log/mm-dd-yyyy.log file")
     test_logger.debug("debug information")
 
-Or, you can directly config or format the test_logger, just as you do for a normal logging handler.
-(See standard logging module to get more information), the following code is to add file handler
-with a time format in the file name
+By default, log level is WARNING, and the log will be outputted to standard output automatically. If
+*TESTSTEP_LOG_PATH* environment variable is defined. The log will be outputted to the defined directory
+too with a time stamp each time when running a test. For example, when you defined
 
-.. code-block:: python
+.. code-block::
 
-    import logging, time
-    file_name = time.strftime('/tmp/test'+"_%Y%m%d_%H%M.log")
-    fh = logging.FileHandler(file_name)
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    fh.setFormatter(formatter)
-    test_logger.addHandler(fh)
+    #export TESTSTEP_LOG_PATH='/home/steven004/test'
+
+
+And the directory does actually exist, you will find the test logs in that directory /home/steven004/test/
+anytime you run a test.
 
 
 You can change the default test_logger or combine with another one using the setlogger method:
@@ -303,4 +302,3 @@ You can change the default test_logger or combine with another one using the set
     # your_logger could be a logging object, or any object which support methods like info, error, ...
 
 
-By default, the log is to the standard output.

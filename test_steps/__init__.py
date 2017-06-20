@@ -14,7 +14,7 @@ import operator
 from .ymal_testbed import init_testbed
 
 __author__ = 'Steven LI'
-__version__ = '0.9.1'
+__version__ = '0.9.5'
 
 __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'match', 'unmatch',
            'has', 'hasnt',
@@ -26,17 +26,24 @@ __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'mat
 def __init_logger():
     global test_logger
 
-    ##### Remove the following handler to provide more flexibility
-    # file_name = time.strftime('/tmp/test'+"_%Y%m%d_%H%M.log")
-    # fh = logging.FileHandler(file_name)
-    # formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    # fh.setFormatter(formatter)
-    # test_logger.addHandler(fh)
-
+    # Default handler to the stand output
     ch = logging.StreamHandler()
     formatter = logging.Formatter('%(levelname)s - %(message)s')
     ch.setFormatter(formatter)
     test_logger.addHandler(ch)
+
+    # Add file handler if TESTSTEP_LOG_DIR environment variable defined
+    relative_base_path = os.environ.get('TESTSTEP_LOG_PATH')
+    if relative_base_path:
+        if os.path.exists(relative_base_path):
+            file_name = time.strftime("test_%Y%m%d_%H%M.log")
+            log_path = os.path.join(os.path.realpath(relative_base_path), file_name)
+            fh = logging.FileHandler(log_path)
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+            fh.setFormatter(formatter)
+            test_logger.addHandler(fh)
+        else:
+            test_logger.warning("log directory $s does not exist!" % relative_base_path)
 
 
 test_logger = logging.getLogger("Test")
