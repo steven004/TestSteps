@@ -265,8 +265,8 @@ Examples:
     tb_m = init_testbed('lesson9_pytestbed_config.py')
 
 
-logging setting (Environment Variable: TESTSTEP_LOG_DIR)
---------------------------------------------------------
+logging setting (Environment Variable: TESTSTEP_LOG_PATH)
+---------------------------------------------------------
 
 The default logger test_logger is a Python logging instance, from the code like:
 

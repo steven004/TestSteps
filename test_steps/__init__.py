@@ -14,7 +14,7 @@ import operator
 from .ymal_testbed import init_testbed
 
 __author__ = 'Steven LI'
-__version__ = '0.9.5'
+__version__ = '0.9.7'
 
 __all__ = ['test_logger', 'ok', 'fail', 'eq', 'ne', 'gt', 'lt', 'le', 'ge', 'match', 'unmatch',
            'has', 'hasnt',
