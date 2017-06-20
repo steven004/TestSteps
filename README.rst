@@ -266,7 +266,7 @@ Examples:
 
 
 logging setting (Environment Variable: TESTSTEP_LOG_PATH)
---------------------------------------------------------
+---------------------------------------------------------
 
 The default logger test_logger is a Python logging instance, from the code like:
 
