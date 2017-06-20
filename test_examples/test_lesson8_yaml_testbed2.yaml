@@ -34,3 +34,7 @@ obj5:
 obj6:
   class: test_examples.lesson8_Sample_module.something2
   name: obj_init17
+
+
+obj7:
+  class: test_examples.lesson8_Sample_module.something3
