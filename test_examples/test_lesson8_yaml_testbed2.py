@@ -34,6 +34,12 @@ def test_with_index_file():
     check("tb_m.obj6.multiple(10) == 170")
     check("tb_m.obj6.multiple(10) == 20", warning=True, repeat=2)
 
+
+def test_without_init():
+    eq(tb_m.obj7.get_value(), 1)
+    eq(tb_m.obj7.get_value(), 2)
+
+
 if __name__ == '__main__':
     test_no_param()
     test_with_param_in_func()

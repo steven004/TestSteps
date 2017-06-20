@@ -24,3 +24,10 @@ class something2(object):
 
     def get_msg(self):
         return self.msg
+
+
+class something3():
+    value = 0
+    def get_value(self):
+        self.value += 1
+        return self.value

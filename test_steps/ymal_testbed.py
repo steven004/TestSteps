@@ -49,12 +49,14 @@ import os, types, re
 import inspect
 import importlib
 
+
 class FileTypeError(TypeError):
     """TestBed file type error exception."""
 
 
 class MissArguments(ValueError):
     """Missed the arguments in the test bed file"""
+
 
 def _invoker_file():
     f = inspect.currentframe()
@@ -97,23 +99,23 @@ def absoluteFilePath(filename, relative_base_file=None):
 
 
 def init_yaml_testbed(filename, tbm):
-    #with open(filename, encoding='utf-8') as f:
     with open(filename) as f:
         object_dict = yaml.load(f)
 
     index_dict = dict()
+
     # See if the testbed_conf is defined in this object file
+    # If yes, load attributes in the files into index_dict
     if 'testbed_conf' in object_dict:
         index_files = object_dict['testbed_conf']
         del object_dict['testbed_conf']
         # The index_file could be a list of a file name.
-        ## If it is not a list, change it to a list.
+        # If it is not a list, change it to a list.
         if isinstance(index_files, str):
             index_files = [index_files]
 
         # load index dictionary
         for index_file in index_files:
-            #with open(index_file, encoding='utf-8') as f:
             index_file_path = absoluteFilePath(index_file, filename)
             with open(index_file_path) as f:
                 index_dict.update(yaml.load(f))
@@ -127,10 +129,16 @@ def init_yaml_testbed(filename, tbm):
         class_file = class_path[:-len(class_name)-1]
         m = importlib.import_module(class_file)
         class_def = getattr(m, class_name)
-        arg_spec = inspect.getargspec(class_def.__init__)
-        args = arg_spec.args[1:]    # remove 'self'
-        defaults = arg_spec.defaults
-        if defaults == None: defaults = []
+        # To get arguments and defaults from __init__function if it exists
+        try:
+            arg_spec = inspect.getargspec(class_def.__init__)
+            args = arg_spec.args[1:]    # remove 'self'
+            defaults = arg_spec.defaults
+            if defaults is None:
+                defaults = []
+        except AttributeError:
+            args = []
+            defaults = []
 
         original_name = attr_dict.get('name')
         if original_name:
